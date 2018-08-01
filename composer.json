@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Wealedger\\": "src/"
+            "Wealedger\\Document\\": "src/"
         }
     },
     "config": {
@@ -26,5 +26,12 @@
         "sort-packages": true,
         "secure-http" : false,
         "optimize-autoloader": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Wealedger\\Document\\DocumentServiceProvider"
+            ]
+        }
     }
 }

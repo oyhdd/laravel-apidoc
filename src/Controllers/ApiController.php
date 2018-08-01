@@ -1,10 +1,10 @@
 <?php
-namespace Wealedger\Controllers;
+namespace Wealedger\Document\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
-use Wealedger\Models\ActionModel;
+use Wealedger\Document\Models\ActionModel;
 
 /**
  * Document controller
