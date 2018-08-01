@@ -13,10 +13,18 @@
             "packagist": false
         }
     ],
-    "require": {},
+    "require": {
+        "laravel/framework": "5.5.*"
+    },
     "autoload": {
         "psr-4": {
             "Wealedger\\": "src/"
         }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "secure-http" : false,
+        "optimize-autoloader": true
     }
 }
