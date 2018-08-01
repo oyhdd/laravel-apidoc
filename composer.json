@@ -1,0 +1,22 @@
+{
+    "name": "wealedger/apidoc",
+    "description": "自动生成在线测试接口和文档",
+    "keywords": ["package", "library"],
+    "license": "MIT",
+    "type": "library",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.ngochain.cn"
+        },
+        {
+            "packagist": false
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Wealedger\\": "src/"
+        }
+    }
+}

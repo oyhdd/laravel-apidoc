@@ -1,0 +1,174 @@
+.TreeMenu {
+	/** TreeMenu整体样式 **/
+	/*font-family: "edwardian script itc";*/
+	min-width: 100%;;
+}
+
+.TreeMenu> .MenuBox {
+	/** 不能选择文本 **/
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+.TreeMenu> .Radius {
+	/** 圆角边框，添加圆角半径的上下Padding **/
+	background: white;
+	border: 1px solid darkgray;
+	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.TreeMenu ul,
+.TreeMenu ol {
+	/** 去掉TreeMenu下面ul/ol的默认样式 **/
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.TreeMenu .MenuName {
+	/** 所有菜单名称的样式 ，flex布局，垂直居中，两端对齐**/
+	align-items: center;
+	/**flexbox兼容**/
+	display: flex;
+	display: -webkit-box;
+	/* OLD - iOS 6-, Safari 3.1-6 */
+	display: -moz-box;
+	/* OLD - Firefox 19- (doesn't work very well) */
+	display: -ms-flexbox;
+	/* TWEENER - IE 10 */
+	display: -webkit-flex;
+	/* NEW - Chrome */
+	/**flexbox兼容**/
+	flex-direction: row;
+	-webkit-box-orient: horizontal;
+	-webkit-flex-direction: row;
+	-moz-flex-direction: row;
+	-ms-flex-direction: row;
+	-o-flex-direction: row;
+	justify-content: space-between;
+	-webkit-justify-content: space-between;
+}
+
+.TreeMenu .Level-1 .MenuName {
+	/** 一级菜单菜单名称样式 **/
+	color: mediumpurple;
+	font-size: 20px;
+	padding: 8px 10px 8px 10px;
+}
+
+.TreeMenu .Level-2 .MenuName {
+	/** 二级菜单菜单名称样式 **/
+	color: darkred;
+	font-size: 18px;
+	padding: 8px 10px 8px 15px;
+}
+
+.TreeMenu .Level-3 .MenuName {
+	/** 三级菜单菜单名称样式 **/
+	color: darkslategrey;
+	font-size: 16px;
+	padding: 8px 10px 8px 20px;
+}
+
+.TreeMenu .Level-4 .MenuName {
+	/** 四级菜单菜单名称样式 **/
+	color: mediumblue;
+	font-size: 14px;
+	padding: 8px 10px 8px 25px;
+}
+
+.TreeMenu .Level-5 .MenuName {
+	/** 五级菜单菜单名称样式 **/
+	color: indigo;
+	font-size: 12px;
+	padding: 8px 10px 8px 30px;
+}
+
+.TreeMenu .Level-6 .MenuName {
+	/** 六级菜单菜单名称样式 **/
+	color: unset;
+	font-size: 10px;
+	padding: 8px 10px 8px 35px;
+}
+
+.TreeMenu .Level-7 .MenuName {
+	/** 七级菜单菜单名称样式 **/
+	color: unset;
+	font-size: 8px;
+	padding: 8px 10px 8px 40px;
+}
+
+.TreeMenu .MenuName:hover {
+	/** 鼠标滑过菜单样式 **/
+	background: #E3E3E3;
+	font-weight: 600;
+}
+
+.TreeMenu .Level-1 {
+	/** 一级菜单li **/
+	border-bottom: 1px solid gainsboro;
+}
+
+.TreeMenu .Level-1:last-child {
+	/** 最后一个一级菜单左下、右下圆角 **/
+	border-bottom: 0px;
+}
+
+.TreeMenu .Level-2 {
+	/** 二级菜单li **/
+	border-top: 1px solid gainsboro;
+	margin: 0px 10px;
+}
+
+.TreeMenu .Level-3 {
+	/** 三级菜单li **/
+	border-top: 1px solid gainsboro;
+	margin: 0px 20px;
+}
+
+.TreeMenu .TreeArrowDown {
+	/** 右边三角箭头的样式 **/
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 10px solid darkgray;
+	display: inline-block;
+	width: 0px;
+	height: 0px;
+	transition: all 0.5s ease;
+	-webkit-transition: all 0.5s ease;
+	-moz-transition: all 0.5s ease;
+	-ms-transition: all 0.5s ease;
+	-o-transition: all 0.5s ease;
+}
+
+.TreeMenu .Level.active .TreeArrowDown.rotate {
+	/** 选中当前菜单右边三角箭头逆时针旋转180度 **/
+	-webkit-transform: rotate(-180deg);
+	-moz-transform: rotate(-180deg);
+	-ms-transform: rotate(-180deg);
+	-o-transform: rotate(-180deg);
+	transform: rotate(-180deg);
+}
+
+.TreeMenu .Level .MenuBox {
+	/**  默认不显示所有下级菜单 **/
+	display: none;
+}
+
+.TreeMenu a,
+.TreeMenu a:link,
+.TreeMenu a:hover,
+.TreeMenu a:active,
+.TreeMenu a:visited {
+	/** 去掉a标签样式 **/
+	color: inherit;
+	text-decoration: none;
+}
