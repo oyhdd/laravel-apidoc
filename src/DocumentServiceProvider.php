@@ -1,6 +1,6 @@
 <?php
 
-namespace Wealedger;
+namespace Wealedger\Document;
 
 use Illuminate\Support\ServiceProvider;
 
