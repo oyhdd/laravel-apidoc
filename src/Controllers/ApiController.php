@@ -134,9 +134,19 @@ class ApiController extends Controller
 
         foreach ($routeList as $key => $route) {
             if (empty($route['subMenus'])) {
-                $routeList[$key] = $this->getNavParams($route);//获取路由参数
+                $ret = $this->getNavParams($route);//获取路由参数
+                if (!empty($ret)) {
+                    $routeList[$key] = $ret;
+                } else {
+                    unset($routeList[$key]);
+                }
             } else {
-                $routeList[$key]['subMenus'] = $this->getNavItems($route['subMenus']);//递归获取路由参数
+                $ret = $this->getNavItems($route['subMenus']);//递归获取路由参数
+                if (!empty($ret)) {
+                    $routeList[$key]['subMenus'] = $ret;
+                } else {
+                    unset($routeList[$key]);
+                }
             }
         }
 
@@ -152,7 +162,7 @@ class ApiController extends Controller
 
         $flag = true;
         foreach ($navItems as $key => $navItem) {
-            if ($navItem['name'] == $format['name']) {
+            if (isset($navItem['name']) && isset($format['name']) && $navItem['name'] == $format['name']) {
                 $flag = false;
                 $navItems[$key]['subMenus'] = $this->arrayMerge($navItems[$key]['subMenus'], $format['subMenus'][0]);
             }
