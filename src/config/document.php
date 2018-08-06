@@ -7,9 +7,11 @@ return [
 
     // 不需展示的接口路由
     'hiddenMethods' => [
-        // 'App\Http\Controllers\Back\TestController' => [ //Controller::class
-            // 'test',//该Controller下的action
-        // ],
+        // Controller::class
+        'App\Http\Controllers\TestController' => [
+            'test',//该Controller下的此action
+            '*',//该Controller下的所有action
+        ],
     ],
 
     // 是否显示未配置路由的接口

@@ -200,7 +200,7 @@ class ApiController extends Controller
         foreach ($methods as $method) {
             //过滤自定义隐藏的函数
             if (isset($this->hiddenMethods[$method->class])) {
-                if (in_array($method->name, $this->hiddenMethods[$method->class])) {
+                if (in_array($method->name, $this->hiddenMethods[$method->class]) || in_array('*', $this->hiddenMethods[$method->class])) {
                     continue;
                 }
             }
