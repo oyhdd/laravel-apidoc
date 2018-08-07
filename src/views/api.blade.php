@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jquery.min.js') }}?v=2018"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jsbeautify.js') }}?v=2018"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/checkutil.js') }}?v=2018"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}?v=2018"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}?v=2018"></script>
-        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}?v=2018">
-        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap.css') }}?v=2018">
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jsbeautify.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/checkutil.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}"></script>
+        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}">
+        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap.css') }}">
         <title>在线测试API文档</title>
         <style>
             .TreeMenuList>div {margin: 5px;border: ridge;}
