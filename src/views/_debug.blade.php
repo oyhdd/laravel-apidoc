@@ -137,8 +137,10 @@
         var data = {
             "body" : body,
         }
+        if (Object.keys(header).length > 0) {
+            window.localStorage.setItem('header', JSON.stringify(header));
+        }
 
-        window.localStorage.setItem('header', JSON.stringify(header));
         window.localStorage.setItem(debugUrl, JSON.stringify(data));
     }
 </script>
