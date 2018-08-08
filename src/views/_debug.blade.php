@@ -8,10 +8,11 @@
 
         <div class="col-md-4 col-sm-12">
             <h3>路由：</h3>
-            <h4><?php echo empty($route) ? "未配置路由" : '/'.$route; ?></h4>
+            <span><?php echo empty($route) ? "未配置路由" : '/'.$route; ?></span>
+            </br></br>
             <form role="form">
+                <h3>header</h3>
                 <?php if ($model->header()): ?>
-                    <h3>header</h3>
                     <?php foreach ($model->header() as $param): ?>
                         <div class="form-group">
                             <label>
@@ -20,11 +21,11 @@
                             <input type="text" class="form-control form-control-header" name="<?php echo trim($param['name'], '$'); ?>" >
                         </div>
                     <?php endforeach; ?>
+                <?php else: ?>
+                    <span>无</span>
                 <?php endif; ?>
+                <h3>body</h3>
                 <?php if ($model->params()): ?>
-                    <?php if ($model->header()): ?>
-                        <h3>body</h3>
-                    <?php endif; ?>
                     <?php foreach ($model->params() as $param): ?>
                         <div class="form-group">
                             <label>
@@ -34,7 +35,7 @@
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="form-group">无参数</div>
+                    <div class="form-group">无</div>
                 <?php endif; ?>
                 <button id="submit-btn" type="button" class="btn btn-primary submit-btn" data-loading-text="提交中..." autocomplete="off">提交</button>
             </form>
@@ -107,17 +108,26 @@
         });
     });
 
-    //自动加载参数
+    /**
+     * @name   自动加载参数
+     * @uses   header更新所有接口 body更新当前接口
+     */
     function autoLoadParams() {
         var debugUrl = '<?php echo $debugUrl; ?>';
 
-        var params = JSON.parse(window.localStorage.getItem(debugUrl))
-        if (params) {
-            for (var i in params['header']) {
-                $("input[name='" + i + "']").val(params['header'][i]);
+        //body更新当前接口
+        var data = JSON.parse(window.localStorage.getItem(debugUrl))
+        if (data) {
+            for (var i in data['body']) {
+                $("input[name='" + i + "'].form-control-body").val(data['body'][i]);
             }
-            for (var i in params['body']) {
-                $("input[name='" + i + "']").val(params['body'][i]);
+        }
+
+        //header更新所有接口
+        var header = JSON.parse(window.localStorage.getItem('header'))
+        if (header) {
+            for (var i in header) {
+                $("input[name='" + i + "'].form-control-header").val(header[i]);
             }
         }
     }
@@ -125,10 +135,10 @@
     //存储参数
     function storageParams(debugUrl, header, body) {
         var data = {
-            "header" : header,
             "body" : body,
         }
 
+        window.localStorage.setItem('header', JSON.stringify(header));
         window.localStorage.setItem(debugUrl, JSON.stringify(data));
     }
 </script>
