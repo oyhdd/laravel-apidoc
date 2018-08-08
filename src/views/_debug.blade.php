@@ -7,7 +7,8 @@
     <div class="row">
 
         <div class="col-md-4 col-sm-12">
-            <h3>路由：<?php echo empty($route) ? "未配置路由" : '/'.$route; ?></h3>
+            <h3>路由：</h3>
+            <h4><?php echo empty($route) ? "未配置路由" : '/'.$route; ?></h4>
             <form role="form">
                 <?php if ($model->header()): ?>
                     <h3>header</h3>
@@ -48,6 +49,9 @@
 </div>
 <script type="text/javascript">
     $(function(){
+
+        autoLoadParams();
+
         $('#submit-btn').click(function(){
             var btn = $(this).button('loading');
 
@@ -69,6 +73,9 @@
                     data[$(this).attr('name')] = $(this).val();
                 }
             });
+
+            //存储参数
+            storageParams(debugUrl, header, data)
 
             $.ajax({
                 url: debugUrl,
@@ -99,4 +106,29 @@
             });
         });
     });
+
+    //自动加载参数
+    function autoLoadParams() {
+        var debugUrl = '<?php echo $debugUrl; ?>';
+
+        var params = JSON.parse(window.localStorage.getItem(debugUrl))
+        if (params) {
+            for (var i in params['header']) {
+                $("input[name='" + i + "']").val(params['header'][i]);
+            }
+            for (var i in params['body']) {
+                $("input[name='" + i + "']").val(params['body'][i]);
+            }
+        }
+    }
+
+    //存储参数
+    function storageParams(debugUrl, header, body) {
+        var data = {
+            "header" : header,
+            "body" : body,
+        }
+
+        window.localStorage.setItem(debugUrl, JSON.stringify(data));
+    }
 </script>
