@@ -59,7 +59,7 @@ class ApiController extends Controller
         }
 
         return view('document::api', [
-            'action' => $this->action,
+            'syncHeader' => Config::get('document.syncHeader'),
             'navItems' => $navItems,
             'model' => $this->actionModel,
             'debugRoute' => $this->debugRoute,

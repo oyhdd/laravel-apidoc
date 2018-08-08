@@ -17,4 +17,7 @@ return [
     // 是否显示未配置路由的接口
     'showUndefinedRouter' => false,
 
+    // 各接口的header都自动同步为最新的header
+    'syncHeader' => true,
+
 ];

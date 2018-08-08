@@ -57,19 +57,19 @@
                         <div id="tab1" class="tab_content" style="display: block; padding: 2%;">
                             <?php
                                 echo view('document::_table', [
-                                    'title' => '请求头',
+                                    'title'  => '请求头',
                                     'values' => $model->header(),
                                 ]);
                                 echo view('document::_table', [
-                                    'title' => '请求参数',
+                                    'title'  => '请求参数',
                                     'values' => $model->params(),
                                 ]);
                                 echo view('document::_table', [
-                                    'title' => '返回示例',
+                                    'title'  => '返回示例',
                                     'values' => [],
                                 ]);
                                 echo view('document::_table', [
-                                    'title' => '返回值说明',
+                                    'title'  => '返回值说明',
                                     'values' => [],
                                 ]);
 
@@ -78,9 +78,10 @@
                         <div id="tab2" class="tab_content" style="display: none; ">
                             <?php
                                 echo view('document::_debug', [
-                                    'route' => $debugRoute,
-                                    'debugUrl' => $debugUrl,
-                                    'model' => $model
+                                    'syncHeader' => $syncHeader,
+                                    'route'      => $debugRoute,
+                                    'debugUrl'   => $debugUrl,
+                                    'model'      => $model
                                 ]);
                             ?>
                         </div>
@@ -97,11 +98,11 @@
                     <h1>接口请求参数示例</h1>
                     <?php
                         echo view('document::_table', [
-                            'title' => '请求头',
+                            'title'  => '请求头',
                             'values' => [['name' => 'token', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '令牌校验']]
                         ]);
                         echo view('document::_table', [
-                            'title' => '请求参数',
+                            'title'  => '请求参数',
                             'values' => [['name' => 'phone', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '手机号']]
                         ]);
                     ?>

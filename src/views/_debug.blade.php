@@ -49,6 +49,8 @@
     </div>
 </div>
 <script type="text/javascript">
+    var syncHeader = '<?php echo $syncHeader; ?>';
+
     $(function(){
 
         autoLoadParams();
@@ -115,17 +117,20 @@
     function autoLoadParams() {
         var debugUrl = '<?php echo $debugUrl; ?>';
 
-        //body更新当前接口
+        //加载当前接口的header和body
         var data = JSON.parse(window.localStorage.getItem(debugUrl))
         if (data) {
+            for (var i in data['header']) {
+                $("input[name='" + i + "'].form-control-header").val(data['header'][i]);
+            }
             for (var i in data['body']) {
                 $("input[name='" + i + "'].form-control-body").val(data['body'][i]);
             }
         }
 
-        //header更新所有接口
+        //若设置header同步，则使用最新的header
         var header = JSON.parse(window.localStorage.getItem('header'))
-        if (header) {
+        if (syncHeader && header) {
             for (var i in header) {
                 $("input[name='" + i + "'].form-control-header").val(header[i]);
             }
@@ -135,9 +140,12 @@
     //存储参数
     function storageParams(debugUrl, header, body) {
         var data = {
+            "header" : header,
             "body" : body,
         }
-        if (Object.keys(header).length > 0) {
+
+        //header不为空且设置为同步时缓存
+        if (Object.keys(header).length > 0 && syncHeader) {
             window.localStorage.setItem('header', JSON.stringify(header));
         }
 
