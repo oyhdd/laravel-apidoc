@@ -43,7 +43,9 @@
 
         <div class="col-md-8 col-sm-12" role="main">
             <h3>请求返回:</h3>
-            <pre id="response">Empty.</pre>
+            <pre id="ret">HTTP状态码：</pre>
+
+            <pre id="response">返回内容：</pre>
         </div>
 
     </div>
@@ -87,6 +89,10 @@
                 data: data,
                 success: function(retData) {
                     btn.button('reset');
+                    $('#ret').html("HTTP状态码：200");
+                    $('#ret').css({
+                        color: 'green',
+                    });
                     if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
                         for (key in data) {
                             debugUrl += key + '=' + data[key] + '&';
@@ -104,7 +110,24 @@
                 },
                 error: function(retData) {
                     btn.button('reset');
-                    alert('发生错误');
+                    $('#ret').html("HTTP状态码：" + retData.status);
+                    $('#ret').css({
+                        color: 'red',
+                    });
+                    if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
+                        for (key in data) {
+                            debugUrl += key + '=' + data[key] + '&';
+                        }
+                        window.open(debugUrl);
+                        $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
+                    } else {
+                        if(typeof retData == 'object')
+                        {
+                            retData = JSON.stringify(retData);
+                        }
+                        var formatText = js_beautify(retData, 4, ' ');
+                        $('#response').html(formatText);
+                    }
                 }
             });
         });
