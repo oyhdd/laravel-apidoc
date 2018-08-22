@@ -164,6 +164,10 @@ class ApiController extends Controller
         foreach ($navItems as $key => $navItem) {
             if (isset($navItem['name']) && isset($format['name']) && $navItem['name'] == $format['name']) {
                 $flag = false;
+                if (!isset($navItems[$key]['subMenus']) || !isset($format['subMenus'])) {
+                    continue;
+                }
+
                 $navItems[$key]['subMenus'] = $this->arrayMerge($navItems[$key]['subMenus'], $format['subMenus'][0]);
             }
         }
