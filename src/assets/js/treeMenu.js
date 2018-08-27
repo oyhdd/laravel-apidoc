@@ -99,6 +99,7 @@
     "use strict";
 
     var treeMenu = {};
+    var menuConfig = {};
 
     treeMenu.name = "MenuTree-Simple Left Navigation Tree Menu";
     treeMenu.version = "version-1.0";
@@ -109,7 +110,7 @@
     treeMenu.config = function() {};
 
     treeMenu.init = function(datas, config) {
-        var menuConfig = new treeMenu.config();
+        menuConfig = new treeMenu.config();
         if(checkutil.isUndefined(datas)) {
             console.log("The function treeMenu.init() doesn't have the parameter 'datas' that means the treeMenu has no Datas!");
             return;
@@ -203,7 +204,9 @@
         var ulBox01 = $("<ul>", {
             "class": "MenuBox MenuBox-" + level,
         });
+
         $.each(subMenus, function(i, menu) {
+
             var liItem = $("<li>", {
                 "class": "Level Level-" + level,
             });
@@ -235,7 +238,13 @@
                 eachMenusDom(liItem, subMenus, level);
             }
             if (menu.active) {
-                liItem.parents('.MenuBox').css("display", "block");
+                var current = ulBox01.prev('.MenuName');
+                for (var i = level-1; i > 0 ; i--) {
+                    initClick(current);
+                    current = current.parent('li').parent('.MenuBox').prev('.MenuName')
+                }
+
+
                 liItem.css("background", "#8fd2fb");
             }
         });
@@ -246,19 +255,23 @@
      */
     function initEvent(menuConfig) {
         $(menuConfig.treeMenuId + " .MenuName").on("click", function() {
-            var $arrow = $(this).find(".TreeArrowDown");
-            var $menuBox = $(this).next();
-            var $menuItem = $(this).parent();
-            $menuBox.slideToggle();
-            $arrow.toggleClass("rotate");
-            $menuItem.toggleClass("active");
-            if(menuConfig.multiple === false) {
-                var $brothers = $menuItem.siblings();
-                $brothers.find(".MenuBox").slideUp();
-                $brothers.find(".TreeArrowDown").removeClass("rotate");
-                $brothers.removeClass("active");
-            }
+            initClick(this);
         });
+    }
+
+    function initClick(current) {
+        var $arrow = $(current).find(".TreeArrowDown");
+        var $menuBox = $(current).next();
+        var $menuItem = $(current).parent();
+        $menuBox.slideToggle('fast');
+        $arrow.toggleClass("rotate");
+        $menuItem.toggleClass("active");
+        if(menuConfig.multiple === false) {
+            var $brothers = $menuItem.siblings();
+            $brothers.find(".MenuBox").slideUp('fast');
+            $brothers.find(".TreeArrowDown").removeClass("rotate");
+            $brothers.removeClass("active");
+        }
     }
 
     window.treeMenu = treeMenu;

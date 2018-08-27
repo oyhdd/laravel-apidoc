@@ -7,7 +7,7 @@
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jquery.min.js') }}"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jsbeautify.js') }}"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/checkutil.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}?v=201808271719"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}"></script>
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap.css') }}">
