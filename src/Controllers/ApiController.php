@@ -197,69 +197,72 @@ class ApiController extends Controller
     {
         list($class, $actionName) = explode('@', $route['action']);
 
-        $rf = new \ReflectionClass($class); //构建controller
-        $methods = $rf->getMethods(\ReflectionMethod::IS_PUBLIC); //获取controller中的所有publick函数
-
         $subMenu = [];
-        foreach ($methods as $method) {
-            //过滤自定义隐藏的函数
-            if (isset($this->hiddenMethods[$method->class])) {
-                if (in_array($method->name, $this->hiddenMethods[$method->class]) || in_array('*', $this->hiddenMethods[$method->class])) {
+        try {
+            $rf = new \ReflectionClass($class); //构建controller
+            $methods = $rf->getMethods(\ReflectionMethod::IS_PUBLIC); //获取controller中的所有publick函数
+
+            foreach ($methods as $method) {
+                //过滤自定义隐藏的函数
+                if (isset($this->hiddenMethods[$method->class])) {
+                    if (in_array($method->name, $this->hiddenMethods[$method->class]) || in_array('*', $this->hiddenMethods[$method->class])) {
+                        continue;
+                    }
+                }
+
+                //过滤系统函数
+                if (strpos($method->name, '_') === 0) {
                     continue;
                 }
-            }
 
-            //过滤系统函数
-            if (strpos($method->name, '_') === 0) {
-                continue;
-            }
+                //函数相关信息类
+                $actionModel = new ActionModel($method);
 
-            //函数相关信息类
-            $actionModel = new ActionModel($method);
-
-            //过滤函数名等于函数注释中的name
-            if($actionModel->title() == $method->name) {
-                continue;
-            }
-
-            //未配置路由的函数单独处理
-            if (!isset($this->routerList[$class.'@'.$method->name])) {
-                $this->undefinedRouterList[$class.'@'.$method->name] = $class.'@'.$method->name;
-            }
-
-            if($actionName != $method->name) {
-                continue;
-            }
-
-            $active = false;
-            if (!empty($this->action)) {
-                list($cur_class, $cur_action) = explode($this->delimiter, $this->action);
-                if ($class == $cur_class && $cur_action == $method->name) {
-                    $this->actionModel = $actionModel;
-                    try {
-                        $this->debugUrl = empty($route['href']) ? '' : $this->host . $route['href'];
-                        $this->debugRoute = $route['href'];
-                    } catch (\Exception $e) {
-                        $this->debugUrl = '';
-                        $this->debugRoute = '';
-                    }
-                    $active = true;
-
-                    $cur_method = $this->getMethod($route['methods']);
-                    if (!empty($cur_method)) {
-                        $actionModel->setMethod($cur_method);
-                    }
-
+                //过滤函数名等于函数注释中的name
+                if($actionModel->title() == $method->name) {
+                    continue;
                 }
-            }
 
-            $subMenu = [
-                'name' => $actionModel->title(),
-                'uri' => empty($route['href']) ? '' : $route['href'],
-                'href' => '/document/api?action='.$class.$this->delimiter.$method->name,
-                'active' => $active,
-            ];
-            break;
+                //未配置路由的函数单独处理
+                if (!isset($this->routerList[$class.'@'.$method->name])) {
+                    $this->undefinedRouterList[$class.'@'.$method->name] = $class.'@'.$method->name;
+                }
+
+                if($actionName != $method->name) {
+                    continue;
+                }
+
+                $active = false;
+                if (!empty($this->action)) {
+                    list($cur_class, $cur_action) = explode($this->delimiter, $this->action);
+                    if ($class == $cur_class && $cur_action == $method->name) {
+                        $this->actionModel = $actionModel;
+                        try {
+                            $this->debugUrl = empty($route['href']) ? '' : $this->host . $route['href'];
+                            $this->debugRoute = $route['href'];
+                        } catch (\Exception $e) {
+                            $this->debugUrl = '';
+                            $this->debugRoute = '';
+                        }
+                        $active = true;
+
+                        $cur_method = $this->getMethod($route['methods']);
+                        if (!empty($cur_method)) {
+                            $actionModel->setMethod($cur_method);
+                        }
+
+                    }
+                }
+
+                $subMenu = [
+                    'name' => $actionModel->title(),
+                    'uri' => empty($route['href']) ? '' : $route['href'],
+                    'href' => '/document/api?action='.$class.$this->delimiter.$method->name,
+                    'active' => $active,
+                ];
+                break;
+            }
+        } catch (\Exception $e) {
         }
 
         return $subMenu;
