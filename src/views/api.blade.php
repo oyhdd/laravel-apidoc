@@ -185,12 +185,6 @@
                     btn.button('reset');
                     return;
                 }
-                var desc = $('#input_'+type).val();
-                if (desc == '') {
-                    alert("内容不能为空");
-                    btn.button('reset');
-                    return;
-                }
 
                 $.ajax({
                     url: '/document/upload-example',
@@ -198,7 +192,7 @@
                     data: {
                         type: type,
                         action: debugRoute,
-                        desc: desc,
+                        desc: $('#input_'+type).val(),
                     },
                     success: function(retData) {
                         btn.button('reset');
