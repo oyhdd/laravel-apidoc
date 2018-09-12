@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jquery.min.js') }}"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/jsbeautify.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/checkutil.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/checkutil.js') }}?v=201809121443"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}?v=201808271719"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}"></script>
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}">
@@ -64,16 +64,26 @@
                                     'title'  => '请求参数',
                                     'values' => $model->params(),
                                 ]);
-                                echo view('document::_table', [
-                                    'title'  => '返回示例',
-                                    'values' => [],
-                                ]);
-                                echo view('document::_table', [
-                                    'title'  => '返回值说明',
-                                    'values' => [],
-                                ]);
-
                             ?>
+
+                            <h3>请求示例</h3>
+                            <textarea id="input_request" class="input-example" style="width:80%;overflow: scroll;"></textarea>
+                            <div class="form-group">
+                                <button name="request" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                            </div>
+
+                            <h3>返回示例</h3>
+                            <textarea id="input_response" class="input-example" style="width:80%;; min-height:400px;max-height:600px;overflow: scroll;"></textarea>
+                            <div class="form-group">
+                                <button name="response" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                            </div>
+
+                            <h3>返回值说明</h3>
+                            <textarea id="input_response_desc" class="input-example" style="width:80%; min-height:200px;max-height:600px;overflow: scroll;"></textarea>
+                            <div class="form-group">
+                                <button name="response_desc" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                            </div>
+
                         </div>
                         <div id="tab2" class="tab_content" style="display: none; ">
                             <?php
@@ -106,7 +116,7 @@
                             'values' => [['name' => 'phone', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '手机号']]
                         ]);
                     ?>
-                    <h1>错误码规范 (待补充)</h1>
+                    <h1>错误码规范</h1>
                     <table class="table table-condensed table-bordered table-striped table-hover request-table">
                         <thead>
                             <tr>
@@ -134,6 +144,8 @@
     </body>
     <script type="text/javascript">
 
+        var debugRoute = '<?php echo $debugRoute; ?>';
+
         $(document).ready(function() {
 
             //左侧菜单栏
@@ -158,6 +170,67 @@
                 $(activeTab).fadeIn();
                 return false;
             });
+
+            renderExample('request');
+            renderExample('response');
+            renderExample('response_desc');
+
+            //保存请求响应示例
+            $('.submit-example').click(function(){
+                var type = $(this).attr('name');
+
+                var btn = $(this).button('loading');
+                if (debugRoute == '') {
+                    alert("未配置路由");
+                    btn.button('reset');
+                    return;
+                }
+                var desc = $('#input_'+type).val();
+                if (desc == '') {
+                    alert("内容不能为空");
+                    btn.button('reset');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/document/upload-example',
+                    type: 'POST',
+                    data: {
+                        type: type,
+                        action: debugRoute,
+                        desc: desc,
+                    },
+                    success: function(retData) {
+                        btn.button('reset');
+                    },
+                    error: function(retData) {
+                        btn.button('reset');
+                        alert('保存失败');
+                    }
+                });
+            });
         });
-    </script>
+
+        //加载请求返回说明示例
+        function renderExample(type) {
+            $.ajax({
+                url: '/document/get-example',
+                type: 'GET',
+                data: {
+                    type: type,
+                    action: debugRoute
+                },
+                success: function(retData) {
+                    $('#input_'+type).html(retData.data);
+                    $('#input_'+type).autoTextarea({
+                        maxHeight:800,
+                        minHeight:50
+                    });
+                },
+                error: function(retData) {
+                }
+            });
+        }
+
+</script>
 </html>

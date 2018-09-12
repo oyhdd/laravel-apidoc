@@ -1,6 +1,6 @@
 /**
  * checkutil工具类
- * 
+ *
  * @author DarkRanger
  * https://coding.net/u/wrcold520/p/JavaScript-lib/git/blob/master/js/checkutil.js
  */
@@ -11,11 +11,11 @@
 
 	/**
 	 * 判断是否尚未定义
-	 * 
+	 *
 	 * 	示例：声明但未定义
 	 * 	var undefinedEle;
 	 * 	checkutil.isUndefined(undefinedEle);//true
-	 * 
+	 *
 	 * @param {Object} obj
 	 */
 	checkutil.isUndefined = function(obj) {
@@ -23,11 +23,11 @@
 	};
 	/**
 	 * 判断是否是一个不存在的对象
-	 * 
+	 *
 	 * 	示例：返回的是一个不存在的对象
 	 *	var ele= document.getElementById("donotExistEle");
 	 * 	checkutil.isNull(ele);//true
-	 * 
+	 *
 	 * @param {Object} obj
 	 */
 	checkutil.isNull = function(obj) {
@@ -39,12 +39,12 @@
 	 *	1. 如果Type(number) 不是数字, 返回 false.
 	 *	2. 如果数字是NaN, 返回true.
 	 *	3. 其他情况，返回false.
-	 * 
-	 * 
+	 *
+	 *
 	 * 需要注意的是：
 	 * 	NaN与其他任何值都不相等，包括它自己
 	 * 		NaN===NaN;								//false
-	 * 
+	 *
 	 * 	isNaN与Number.isNaN是两个不同的方法
 	 * 		console.log(isNaN(NaN));				//true
 	 *		console.log(isNaN(Number.NaN));			//true
@@ -123,4 +123,27 @@
 
 	window.checkutil = checkutil;
 
+	$.fn.autoTextarea = function(options) {
+		var defaults={
+			maxHeight:null,
+			minHeight:$(this).height()
+		};
+		var opts = $.extend({},defaults,options);
+		return $(this).each(function() {
+			$(this).bind("paste cut keydown keyup focus blur",function(){
+				var height,style=this.style;
+				this.style.height = opts.minHeight + 'px';
+				if (this.scrollHeight > opts.minHeight) {
+					if (opts.maxHeight && this.scrollHeight > opts.maxHeight) {
+						height = opts.maxHeight;
+						style.overflowY = 'scroll';
+					} else {
+						height = this.scrollHeight;
+						style.overflowY = 'hidden';
+					}
+					style.height = height + 'px';
+				}
+			});
+		});
+	};
 }();

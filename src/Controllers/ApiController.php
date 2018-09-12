@@ -1,6 +1,7 @@
 <?php
 namespace Wealedger\Document\Controllers;
 
+use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
@@ -66,6 +67,37 @@ class ApiController extends Controller
             'debugUrl' => $this->debugUrl,
         ]);
 
+    }
+
+
+    /**
+     * 上传接口请求返回示例
+     */
+    public function uploadExample(Request $request)
+    {
+        $type = $request->get('type');
+        $action = $request->get('action');
+        $desc = $request->get('desc');
+
+        Cache::forever("document::{$type}::{$action}", $desc);
+        return [];
+    }
+
+    /**
+     * 获取接口请求返回示例
+     */
+    public function getExample(Request $request)
+    {
+        $ret = [
+            'code' => 0,
+            'msg' => '获取成功',
+            'data' => [],
+        ];
+        $type = $request->get('type');
+        $action = $request->get('action');
+
+        $desc = Cache::get("document::{$type}::{$action}");
+        return ['data' => $desc];
     }
 
     //获取路由分组配置信息
