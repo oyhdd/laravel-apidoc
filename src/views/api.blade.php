@@ -73,7 +73,7 @@
                             </div>
 
                             <h3>返回示例</h3>
-                            <textarea id="input_response" class="input-example" style="width:80%;; min-height:400px;max-height:600px;overflow: scroll;"></textarea>
+                            <textarea id="input_response" class="input-example" style="width:80%;; min-height:300px;max-height:600px;overflow: scroll;"></textarea>
                             <div class="form-group">
                                 <button name="response" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
                             </div>
