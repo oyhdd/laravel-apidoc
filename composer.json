@@ -1,23 +1,20 @@
 {
-    "name": "wealedger/apidoc",
+    "name": "oyhdd/laravel-apidoc",
     "description": "自动生成在线测试接口和文档",
     "keywords": ["package", "library"],
     "license": "MIT",
     "type": "library",
-    "repositories": [
+    "authors": [
         {
-            "type": "composer",
-            "url": "http://packages.ngochain.cn"
-        },
-        {
-            "packagist": false
+            "name": "wangmeng",
+            "email": "1040089624@qq.com"
         }
     ],
     "require": {
     },
     "autoload": {
         "psr-4": {
-            "Wealedger\\Document\\": "src/"
+            "Oyhdd\\Document\\": "src/"
         }
     },
     "config": {
@@ -29,7 +26,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Wealedger\\Document\\DocumentServiceProvider"
+                "Oyhdd\\Document\\DocumentServiceProvider"
             ]
         }
     }
