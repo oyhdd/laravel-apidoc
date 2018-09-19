@@ -18,7 +18,7 @@
                             <label>
                                 <?php echo $param['name']; ?>
                             </label>
-                            <input type="text" class="form-control form-control-header" name="<?php echo trim($param['name'], '$'); ?>" >
+                            <input type="text" class="form-control form-control-header" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -29,9 +29,9 @@
                     <?php foreach ($model->params() as $param): ?>
                         <div class="form-group">
                             <label>
-                                <?php echo $param['name']; ?>
+                                <?php echo  $param['name']; ?>
                             </label>
-                            <input type="text" class="form-control form-control-body" name="<?php echo trim($param['name'], '$'); ?>">
+                            <input type="text" class="form-control form-control-body" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
