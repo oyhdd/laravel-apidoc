@@ -5,18 +5,18 @@
 ### 1.在项目根目录下执行
 
 ```
-composer require wealedger/apidoc
+composer require oyhdd/laravel-apidoc
 ```
 
 ### 2.发布资源文件及配置文件
 
 ```
-php artisan vendor:publish --provider="Wealedger\Document\DocumentServiceProvider"
+php artisan vendor:publish --provider="Oyhdd\Document\DocumentServiceProvider"
 ```
 注：若文件已存在，可通过以下命令强制覆盖
 
 ```
-php artisan vendor:publish --provider="Wealedger\Document\DocumentServiceProvider" --force
+php artisan vendor:publish --provider="Oyhdd\Document\DocumentServiceProvider" --force
 ```
 
 文件发布成功后，会生成配置文件config/document.php，前端资源文件resources/views/vendor/document/* 和 public/vendor/document/*

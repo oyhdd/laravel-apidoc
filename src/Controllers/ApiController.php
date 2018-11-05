@@ -1,11 +1,11 @@
 <?php
-namespace Wealedger\Document\Controllers;
+namespace Oyhdd\Document\Controllers;
 
 use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
-use Wealedger\Document\Models\ActionModel;
+use Oyhdd\Document\Models\ActionModel;
 
 /**
  * Document controller

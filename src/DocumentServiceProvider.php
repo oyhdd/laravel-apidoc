@@ -1,6 +1,6 @@
 <?php
 
-namespace Wealedger\Document;
+namespace Oyhdd\Document;
 
 use Illuminate\Support\ServiceProvider;
 

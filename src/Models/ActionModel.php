@@ -1,6 +1,6 @@
 <?php
 
-namespace Wealedger\Document\Models;
+namespace Oyhdd\Document\Models;
 
 /**
  * 接口详情类
