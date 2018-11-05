@@ -18,7 +18,7 @@
                             <label>
                                 <?php echo $param['name']; ?>
                             </label>
-                            <input type="text" class="form-control form-control-header" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
+                            <input type="text" class="form-control form-control-header" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -31,7 +31,7 @@
                             <label>
                                 <?php echo  $param['name']; ?>
                             </label>
-                            <input type="text" class="form-control form-control-body" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
+                            <input type="text" class="form-control form-control-body" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -69,13 +69,29 @@
                 return;
             }
             $('.form-control-header').each(function(){
-                if ($(this).val() != '') {
-                    header[$(this).attr('name')] = $(this).val();
+                var val = $(this).val();
+                if (val != '') {
+                    var data_type = $(this).attr('data_type');
+                    var type = '';
+                    if ($(this).attr('data_type') == 'array') {
+                        type = '[]';
+                        val = new Array();
+                        val = $(this).val().split(',');
+                    }
+                    header[$(this).attr('name') + type] = (data_type == 'int') ? Number(val) : val;
                 }
             });
             $('.form-control-body').each(function(){
-                if ($(this).val() != '') {
-                    data[$(this).attr('name')] = $(this).val();
+                var val = $(this).val();
+                if (val != '') {
+                    var data_type = $(this).attr('data_type');
+                    var type = '';
+                    if (data_type == 'array') {
+                        type = '[]';
+                        val = new Array();
+                        val = $(this).val().split(',');
+                    }
+                    data[$(this).attr('name') + type] = (data_type == 'int') ? Number(val) : val;
                 }
             });
 
@@ -147,7 +163,12 @@
                 $("input[name='" + i + "'].form-control-header").val(data['header'][i]);
             }
             for (var i in data['body']) {
-                $("input[name='" + i + "'].form-control-body").val(data['body'][i]);
+                var cache = data['body'][i];
+                if (cache instanceof Array) {
+                    i = i.slice(0, -2);
+                    cache = cache.join(',');
+                }
+                $("input[name='" + i + "'].form-control-body").val(cache);
             }
         }
 
