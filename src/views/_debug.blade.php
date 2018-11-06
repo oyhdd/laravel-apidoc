@@ -43,7 +43,7 @@
 
         <div class="col-md-8 col-sm-12" role="main">
             <h3>请求返回:</h3>
-            <pre id="ret">HTTP状态码：</pre>
+            <pre id="ret">HTTP状态码：</br>请求时间：</pre>
 
             <pre id="response">返回内容：</pre>
         </div>
@@ -97,15 +97,17 @@
 
             //存储参数
             storageParams(debugUrl, header, data)
-
+            var sendDate = (new Date()).getTime();
+            console.log(1,sendDate)
             $.ajax({
                 url: debugUrl,
                 type: '<?php echo $model->method(); ?>',
                 headers: header,
                 data: data,
                 success: function(retData) {
+                    var receiveDate = (new Date()).getTime();
                     btn.button('reset');
-                    $('#ret').html("HTTP状态码：200");
+                    $('#ret').html("HTTP状态码：200</br>请求时间："+(receiveDate - sendDate)+"ms");
                     $('#ret').css({
                         color: 'green',
                     });
@@ -116,17 +118,20 @@
                         window.open(debugUrl);
                         $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
                     } else {
-                        if(typeof retData == 'object')
-                        {
+
+                        if (typeof retData == 'object') {
                             retData = JSON.stringify(retData);
+                            var formatText = js_beautify(retData, 4, ' ');
+                        } else {
+                            var formatText = retData;
                         }
-                        var formatText = js_beautify(retData, 4, ' ');
                         $('#response').html(formatText);
                     }
                 },
                 error: function(retData) {
+                    var receiveDate = (new Date()).getTime();
                     btn.button('reset');
-                    $('#ret').html("HTTP状态码：" + retData.status);
+                    $('#ret').html("HTTP状态码：" + retData.status + "</br>请求时间："+(receiveDate - sendDate)+"ms");
                     $('#ret').css({
                         color: 'red',
                     });
@@ -137,11 +142,12 @@
                         window.open(debugUrl);
                         $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
                     } else {
-                        if(typeof retData == 'object')
-                        {
+                        if (retData.responseText.indexOf('<script> Sfdump = window.Sfdump') != -1) {
+                            var formatText = retData.responseText;
+                        } else if (typeof retData == 'object') {
                             retData = JSON.stringify(retData);
+                            var formatText = js_beautify(retData, 4, ' ');
                         }
-                        var formatText = js_beautify(retData, 4, ' ');
                         $('#response').html(formatText);
                     }
                 }
