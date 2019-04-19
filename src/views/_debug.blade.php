@@ -16,9 +16,14 @@
                     <?php foreach ($model->header() as $param): ?>
                         <div class="form-group">
                             <label>
-                                <?php echo $param['name']; ?>
+                                <?php
+                                    echo $param['name'];
+                                    if (!empty($param['is_necessary'])) {
+                                        echo '<span style="color:red">&nbsp*</span>';
+                                    }
+                                ?>
                             </label>
-                            <input type="text" class="form-control form-control-header" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
+                            <textarea type="text" class="form-control form-control-header" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>" style="height: 34px"></textarea>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -29,9 +34,19 @@
                     <?php foreach ($model->params() as $param): ?>
                         <div class="form-group">
                             <label>
-                                <?php echo  $param['name']; ?>
+                                <?php
+                                    echo $param['name'];
+                                    if (!empty($param['is_necessary'])) {
+                                        echo '<span style="color:red">&nbsp*</span>';
+                                    }
+                                ?>
                             </label>
-                            <input type="text" class="form-control form-control-body" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>">
+                            <?php if ($param['type'] == 'file'): ?>
+                                <input type="<?php echo ($param['type'] == 'file') ? 'file' : 'text'; ?>" class="form-control form-control-body" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>" style="height: 34px"></input>
+                            <?php else: ?>
+                                <textarea type="<?php echo ($param['type'] == 'file') ? 'file' : 'text'; ?>" class="form-control form-control-body" data_type="<?php echo $param['type']?>" name="<?php echo trim($param['name'], '$'); ?>" placeholder="<?php echo $param['desc']; ?>" style="height: 34px"></textarea>
+                            <?php endif; ?>
+
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -52,12 +67,16 @@
 </div>
 <script type="text/javascript">
     var syncHeader = '<?php echo $syncHeader; ?>';
-
     $(function(){
 
         autoLoadParams();
 
         $('#submit-btn').click(function(){
+
+            var form = new FormData();
+            var processData = false;
+            var contentType = false;
+
             var btn = $(this).button('loading');
 
             var header = {};
@@ -70,8 +89,8 @@
             }
             $('.form-control-header').each(function(){
                 var val = $(this).val();
+                var data_type = $(this).attr('data_type');
                 if (val != '') {
-                    var data_type = $(this).attr('data_type');
                     var type = '';
                     if ($(this).attr('data_type') == 'array') {
                         type = '[]';
@@ -83,13 +102,23 @@
             });
             $('.form-control-body').each(function(){
                 var val = $(this).val();
-                if (val != '') {
-                    var data_type = $(this).attr('data_type');
+                var data_type = $(this).attr('data_type');
+                if (data_type == 'file') {
+                    var files = $(this).prop('files');
+                    if (files.length != 0) {
+                        form.append($(this).attr('name'), files[0]);
+                    }
+                } else if (val != '') {
                     var type = '';
                     if (data_type == 'array') {
                         type = '[]';
                         val = new Array();
                         val = $(this).val().split(',');
+                        for (var param in val) {
+                            form.append($(this).attr('name')+'[]', val[param]);
+                        }
+                    } else {
+                        form.append($(this).attr('name'), val);
                     }
                     data[$(this).attr('name') + type] = (data_type == 'int') ? Number(val) : val;
                 }
@@ -98,13 +127,24 @@
             //存储参数
             storageParams(debugUrl, header, data)
             var sendDate = (new Date()).getTime();
-            console.log(1,sendDate)
+            var request_method = '<?php echo $model->method(); ?>';
+            if (request_method == 'GET' || request_method == 'get') {
+                form = data;
+                processData = true;
+                contentType = true;
+            }
             $.ajax({
                 url: debugUrl,
-                type: '<?php echo $model->method(); ?>',
+                type: request_method,
                 headers: header,
-                data: data,
+                data: form,
+                processData:processData,
+                contentType:contentType,
                 success: function(retData) {
+
+                    if (typeof retData === 'string') {
+                        retData = $.trim(retData);
+                    }
                     var receiveDate = (new Date()).getTime();
                     btn.button('reset');
                     $('#ret').html("HTTP状态码：200</br>请求时间："+(receiveDate - sendDate)+"ms");
@@ -118,13 +158,20 @@
                         window.open(debugUrl);
                         $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
                     } else {
-
                         if (typeof retData == 'object') {
+                            retData = JSON.stringify(retData);
+                            var formatText = js_beautify(retData, 4, ' ');
+                        } else if (retData.indexOf('<script> Sfdump = window.Sfdump') != -1) {
+                            var formatText = retData;
+                        } else if (typeof retData === 'string') {
+                            //防中文乱码
+                            retData = eval("("+retData+")")
                             retData = JSON.stringify(retData);
                             var formatText = js_beautify(retData, 4, ' ');
                         } else {
                             var formatText = retData;
                         }
+
                         $('#response').html(formatText);
                     }
                 },
@@ -166,7 +213,7 @@
         var data = JSON.parse(window.localStorage.getItem(debugUrl))
         if (data) {
             for (var i in data['header']) {
-                $("input[name='" + i + "'].form-control-header").val(data['header'][i]);
+                $("textarea[name='" + i + "'].form-control-header").val(data['header'][i]);
             }
             for (var i in data['body']) {
                 var cache = data['body'][i];
@@ -174,7 +221,7 @@
                     i = i.slice(0, -2);
                     cache = cache.join(',');
                 }
-                $("input[name='" + i + "'].form-control-body").val(cache);
+                $("textarea[name='" + i + "'].form-control-body").val(cache);
             }
         }
 
@@ -182,7 +229,7 @@
         var header = JSON.parse(window.localStorage.getItem('header'))
         if (syncHeader && header) {
             for (var i in header) {
-                $("input[name='" + i + "'].form-control-header").val(header[i]);
+                $("textarea[name='" + i + "'].form-control-header").val(header[i]);
             }
         }
     }
