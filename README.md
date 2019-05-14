@@ -21,6 +21,11 @@ php artisan vendor:publish --provider="Oyhdd\Document\DocumentServiceProvider" -
 
 文件发布成功后，会生成配置文件config/document.php，前端资源文件resources/views/vendor/document/* 和 public/vendor/document/*
 
+### 3.创建数据表
+```
+php artisan migrate --path=./vendor/oyhdd/laravel-apidoc/src/database/migrations/
+```
+
 在浏览器打开{host}/document/api 后即可访问
 
 ## 二.使用方法

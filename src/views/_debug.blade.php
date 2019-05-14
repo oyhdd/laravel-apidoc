@@ -1,16 +1,22 @@
 <style type="text/css">
+    .input-group{margin: 10px 0}
     .form-group{margin-top: 10px}
     .form-group input{width: 100%;}
-    .submit-btn{margin: 20px 0; background: linear-gradient(to right, #2091cf, #0758f0);color: white;}
+    .submit-btn{width: 82px;margin: 20px 0; background: linear-gradient(to right, #2091cf, #0758f0);color: white;}
+    .delete-btn{width: 82px;margin: 20px 0; background: linear-gradient(to right, #f36565, #c55c5c);color: white;}
+    .save-btn{width: 82px;background: linear-gradient(to right, #5dd03e, #5CB85C);color: white;}
 </style>
 <div class="container-fluid" style="padding:2%;">
     <div class="row">
 
         <div class="col-md-4 col-sm-12">
-            <h3>路由：</h3>
-            <span><?php echo empty($route) ? "未配置路由" : '/'.$route; ?></span>
+            <h3>测试用例：</h3>
+
+            <select  id="selectpicker" class="selectpicker" data-style="btn-info" data-live-search="true">
+            </select>
+
             </br></br>
-            <form role="form">
+            <form role="form" class="debug">
                 <h3>header</h3>
                 <?php if ($model->header()): ?>
                     <?php foreach ($model->header() as $param): ?>
@@ -52,36 +58,52 @@
                 <?php else: ?>
                     <div class="form-group">无</div>
                 <?php endif; ?>
-                <button id="submit-btn" type="button" class="btn btn-primary submit-btn" data-loading-text="提交中..." autocomplete="off">提交</button>
+                <button id="submit-btn" type="button" class="btn submit-btn" data-loading-text="运行中..." autocomplete="off">运行</button>
+                <button id="delete-btn" type="button" class="btn delete-btn" data-loading-text="删除中..." autocomplete="off" style="display: none">删除用例</button>
             </form>
         </div>
 
         <div class="col-md-8 col-sm-12" role="main">
             <h3>请求返回:</h3>
+            <div class="input-group">
+                <input id="save_title" type="text" class="form-control" placeholder="请输入测试用例标题">
+                <span class="input-group-btn">
+                    <button id="save-btn" type="button" class="btn save-btn" data-loading-text="保存中..." autocomplete="off">保存用例</button>
+                </span>
+            </div>
             <pre id="ret">HTTP状态码：</br>请求时间：</pre>
-
             <pre id="response">返回内容：</pre>
         </div>
 
     </div>
 </div>
 <script type="text/javascript">
-    var syncHeader = '<?php echo $syncHeader; ?>';
+    var header = {};
+    var data = {};
+    var can_save = false;
+    var response = {};
+    var author = '<?php echo $model->author(); ?>';
+    var uses = '<?php echo $model->uses(); ?>';
+    var title = '<?php echo $model->title(); ?>';
+    var debugUrl = '<?php echo $debugUrl; ?>';
+    var request_method = '<?php echo $model->method(); ?>';
+    var testUnitData = {};
+
     $(function(){
 
-        autoLoadParams();
+        // autoLoadParams();
 
         $('#submit-btn').click(function(){
 
             var form = new FormData();
             var processData = false;
             var contentType = false;
+            header = {};
+            data = {};
+            response = {};
 
             var btn = $(this).button('loading');
 
-            var header = {};
-            var data = {};
-            var debugUrl = '<?php echo $debugUrl; ?>';
             if (debugUrl == '') {
                 alert("未配置路由");
                 btn.button('reset');
@@ -124,10 +146,7 @@
                 }
             });
 
-            //存储参数
-            storageParams(debugUrl, header, data)
             var sendDate = (new Date()).getTime();
-            var request_method = '<?php echo $model->method(); ?>';
             if (request_method == 'GET' || request_method == 'get') {
                 form = data;
                 processData = true;
@@ -141,6 +160,8 @@
                 processData:processData,
                 contentType:contentType,
                 success: function(retData) {
+                    can_save = true;
+                    response = retData;
 
                     if (typeof retData === 'string') {
                         retData = $.trim(retData);
@@ -200,52 +221,140 @@
                 }
             });
         });
+
+        // 保存测试用例
+        $('#save-btn').click(function(){
+            var title = $("#save_title").val();
+
+            if (!can_save) {
+                alert("请先提交测试并确保测试结果正确");
+                return;
+            }
+            if (title == '') {
+                alert("请填写测试用例标题");
+                return;
+            }
+
+            var btn = $(this).button('loading');
+            $.ajax({
+                url: '/document/upload-api-params',
+                type: 'POST',
+                data: {
+                    title: title,
+                    url: debugUrl,
+                    method: request_method,
+                    header: header,
+                    body: data,
+                    response: response,
+                    author: author,
+                    uses: uses,
+                },
+                success: function(retData) {
+                    if (retData.code == 0) {
+                        can_save = false;
+                    }
+                    refreshTestUnit();
+                    alert(retData.message);
+                },
+                error: function(retData) {
+                    alert('保存失败！')
+                }
+            });
+            btn.button('reset');
+        });
+
+        // 保存测试用例
+        $('#delete-btn').click(function(){
+            if(!confirm("确定删除该测试用例?")){
+                return;
+            }
+            var test_unit_index = $('#selectpicker').val();
+
+            var btn = $(this).button('loading');
+            $.ajax({
+                url: '/document/delete-api-params',
+                type: 'POST',
+                data: {
+                    id: testUnitData[test_unit_index]['id'],
+                },
+                success: function(retData) {
+                    if (retData.code == 0) {
+                        alert(retData.message);
+                    }
+                    refreshTestUnit();
+                },
+                error: function(retData) {
+                    alert('删除失败！')
+                }
+            });
+            btn.button('reset');
+        });
+
+        //初始化测试用例下拉框
+        $('#selectpicker').on('loaded.bs.select', function () {
+            refreshTestUnit()
+        });
+
+        //下拉选择改变事件
+        $('#selectpicker').on('changed.bs.select', function () {
+            var test_unit_index = $('#selectpicker').val();
+            autoLoadParams(test_unit_index);
+        });
     });
+
+    //刷新测试用例
+    function refreshTestUnit() {
+        $(".selectpicker").empty();//清空option列表数据
+            $(".selectpicker").append("<option value='-1'>新建用例</option>")
+            $.ajax({
+                url: '/document/get-api-params',
+                type: 'GET',
+                data: {
+                    url: debugUrl,
+                },
+                success: function(retData) {
+                    if (retData.code == 0) {
+                        testUnitData = retData.data;
+                        for (var i in testUnitData) {
+                            $(".selectpicker").append("<option value='"+i+"'>"+testUnitData[i].title+"</option>")
+                        }
+                    }
+                    $('.selectpicker').selectpicker('refresh');
+                },
+                error: function(retData) {
+                    alert('保存失败！')
+                }
+            });
+    }
 
     /**
      * @name   自动加载参数
      * @uses   header更新所有接口 body更新当前接口
      */
-    function autoLoadParams() {
-        var debugUrl = '<?php echo $debugUrl; ?>';
-
+    function autoLoadParams(test_unit_index) {
+        $(".debug textarea").val("");
+        $("#save_title").val("");
+        if (test_unit_index < 0) {
+            $("#save_title").removeAttr("readonly");
+            $("#delete-btn").css('display','none');
+            return;
+        }
+        $("#delete-btn").css('display','inline');
+        $("#save_title").attr("readonly","readonly");
+        $("#save_title").val(testUnitData[test_unit_index]['title']);
+        var data = testUnitData[test_unit_index];
         //加载当前接口的header和body
-        var data = JSON.parse(window.localStorage.getItem(debugUrl))
-        if (data) {
-            for (var i in data['header']) {
-                $("textarea[name='" + i + "'].form-control-header").val(data['header'][i]);
+
+        for (var i in testUnitData[test_unit_index]['header']) {
+            $("textarea[name='" + i + "'].form-control-header").val(data['header'][i]);
+        }
+        for (var i in testUnitData[test_unit_index]['body']) {
+            var cache = data['body'][i];
+            if (cache instanceof Array) {
+                i = i.slice(0, -2);
+                cache = cache.join(',');
             }
-            for (var i in data['body']) {
-                var cache = data['body'][i];
-                if (cache instanceof Array) {
-                    i = i.slice(0, -2);
-                    cache = cache.join(',');
-                }
-                $("textarea[name='" + i + "'].form-control-body").val(cache);
-            }
+            $("textarea[name='" + i + "'].form-control-body").val(cache);
         }
-
-        //若设置header同步，则使用最新的header
-        var header = JSON.parse(window.localStorage.getItem('header'))
-        if (syncHeader && header) {
-            for (var i in header) {
-                $("textarea[name='" + i + "'].form-control-header").val(header[i]);
-            }
-        }
-    }
-
-    //存储参数
-    function storageParams(debugUrl, header, body) {
-        var data = {
-            "header" : header,
-            "body" : body,
-        }
-
-        //header不为空且设置为同步时缓存
-        if (Object.keys(header).length > 0 && syncHeader) {
-            window.localStorage.setItem('header', JSON.stringify(header));
-        }
-
-        window.localStorage.setItem(debugUrl, JSON.stringify(data));
     }
 </script>

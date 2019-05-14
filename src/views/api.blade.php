@@ -9,8 +9,10 @@
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/checkutil.js') }}?v=201809121443"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}?v=201808271719"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap-select.js') }}"></script>
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap-select.css') }}">
         <title>在线测试API文档</title>
         <style>
             .TreeMenuList>div {margin: 5px;border: ridge;}
@@ -27,6 +29,7 @@
             table tbody tr:nth-child(2n+1){background:#f9f9f9}
             table thead tr th{text-align: left;border: 1px solid #dddddd;background-color: #ddd;}
             table td{text-align: left;border: 1px solid #dddddd;vertical-align: inherit;}
+            .submit-example{background: linear-gradient(to right, #2091cf, #0758f0);}
         </style>
 
     </head>
@@ -68,15 +71,15 @@
                             ?>
 
                             <h3>请求示例</h3>
-                            <textarea id="input_request" class="input-example" style="width:80%;overflow: scroll;"></textarea>
+                            <textarea id="input_request_example" class="input-example" style="width:80%;overflow: scroll;"></textarea>
                             <div class="form-group">
-                                <button name="request" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                                <button name="request_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
                             </div>
 
                             <h3>返回示例</h3>
-                            <textarea id="input_response" class="input-example" style="width:80%;; min-height:300px;max-height:600px;overflow: scroll;"></textarea>
+                            <textarea id="input_response_example" class="input-example" style="width:80%;; min-height:300px;max-height:600px;overflow: scroll;"></textarea>
                             <div class="form-group">
-                                <button name="response" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                                <button name="response_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
                             </div>
 
                             <h3>返回值说明</h3>
@@ -145,7 +148,11 @@
     </body>
     <script type="text/javascript">
 
-        var debugRoute = '<?php echo $debugRoute; ?>';
+        var debugUrl = '<?php echo $debugUrl; ?>';
+        var request_method = '<?php echo $model->method(); ?>';
+        var author = '<?php echo $model->author(); ?>';
+        var uses = '<?php echo $model->uses(); ?>';
+        var title = '<?php echo $model->title(); ?>';
 
         $(document).ready(function() {
 
@@ -172,29 +179,30 @@
                 return false;
             });
 
-            renderExample('request');
-            renderExample('response');
-            renderExample('response_desc');
+            renderExample();
 
             //保存请求响应示例
             $('.submit-example').click(function(){
                 var type = $(this).attr('name');
 
                 var btn = $(this).button('loading');
-                if (debugRoute == '') {
+                if (debugUrl == '') {
                     alert("未配置路由");
                     btn.button('reset');
                     return;
                 }
                 var desc = $('#input_'+type).val();
-
                 $.ajax({
                     url: '/document/upload-example',
                     type: 'POST',
                     data: {
+                        title: title,
                         type: type,
-                        action: debugRoute,
-                        desc: desc,
+                        value: desc,
+                        url: debugUrl,
+                        method: request_method,
+                        author: author,
+                        uses: uses,
                     },
                     success: function(retData) {
                         btn.button('reset');
@@ -208,24 +216,22 @@
         });
 
         //加载请求返回说明示例
-        function renderExample(type) {
+        function renderExample() {
             $.ajax({
                 url: '/document/get-example',
                 type: 'GET',
                 data: {
-                    type: type,
-                    action: debugRoute
+                    url: debugUrl,
                 },
                 success: function(retData) {
-                    if (typeof retData === 'string') {
-                        retData = $.trim(retData);
-                        retData = JSON.parse(retData);
+                    for (var i in retData) {
+                        $('#input_'+i).html(retData[i]);
+                        $('#input_'+i).autoTextarea({
+                            maxHeight:800,
+                            minHeight:50
+                        });
                     }
-                    $('#input_'+type).html(retData.data);
-                    $('#input_'+type).autoTextarea({
-                        maxHeight:800,
-                        minHeight:50
-                    });
+
                 },
                 error: function(retData) {
                 }

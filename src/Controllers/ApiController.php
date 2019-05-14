@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
 use Oyhdd\Document\Models\ActionModel;
+use Oyhdd\Document\Models\ApiDoc;
+use Oyhdd\Document\Models\ApiDocParams;
 
 /**
  * Document controller
@@ -60,27 +62,102 @@ class ApiController extends Controller
         }
 
         return view('document::api', [
-            'syncHeader' => Config::get('document.syncHeader'),
             'navItems' => $navItems,
             'model' => $this->actionModel,
             'debugRoute' => $this->debugRoute,
             'debugUrl' => $this->debugUrl,
         ]);
-
     }
 
 
     /**
-     * 上传接口请求返回示例
+     * 上传接口请求|返回示例和返回值说明
      */
     public function uploadExample(Request $request)
     {
-        $type = $request->get('type');
-        $action = $request->get('action');
-        $desc = $request->get('desc');
-
-        Cache::forever("document::{$type}::{$action}", $desc);
+        $params = $request->all();
+        if (!empty($params['type'])) {
+            $params[$params['type']] = empty($params['value']) ? "" : $params['value'];
+        }
+        ApiDoc::saveApidoc($params);
         return [];
+    }
+
+
+    /**
+     * 上传接口请求参数,用于回归测试
+     */
+    public function uploadApiParams(Request $request)
+    {
+        $ret = [
+            'code' => 0,
+            'message' => '保存成功！'
+        ];
+
+        $title = $request->get('title');
+        $header = $request->get('header');
+        $body = $request->get('body');
+        $response = $request->get('response');
+        $url = $request->get('url');
+        $method = $request->get('method');
+        if (empty($title)) {
+            $ret['code'] = -1;
+            $ret['message'] = '请填写测试用例标题';
+            return $ret;
+        }
+
+        $this->uploadExample($request);
+        $apidocModel = ApiDoc::getByUrl($url);
+        $params = compact('title', 'header', 'body', 'response');
+        $params['api_id'] = $apidocModel->id;
+
+        if (!ApiDocParams::saveApiParams($params)) {
+            $ret['code'] = -1;
+            $ret['message'] = '保存失败！';
+        }
+        return $ret;
+    }
+
+    public function getApiParams(Request $request)
+    {
+        $ret = [
+            'code' => 0,
+            'message' => '成功！',
+            'data' => [],
+        ];
+
+        $url = $request->get('url');
+        $model = ApiDoc::getByUrl($url);
+        if (empty($model)) {
+            $ret['code'] = -1;
+            $ret['message'] = "未查询到测试用例";
+            return $ret;
+        }
+        $api_id = $model->id;
+        $list = ApiDocParams::getApiParams($api_id);
+        if (empty($list)) {
+            $ret['code'] = -1;
+            $ret['message'] = "未查询到测试用例";
+            return $ret;
+        }
+        $ret['data'] = $list;
+        return $ret;
+    }
+
+    public function deleteApiParams(Request $request)
+    {
+        $ret = [
+            'code' => 0,
+            'message' => '删除成功！',
+            'data' => [],
+        ];
+
+        $id = $request->get('id');
+        if (!ApiDocParams::deleteApiParams($id)) {
+            $ret['code'] = -1;
+            $ret['message'] = "删除失败！";
+        }
+        return $ret;
     }
 
     /**
@@ -88,16 +165,18 @@ class ApiController extends Controller
      */
     public function getExample(Request $request)
     {
-        $ret = [
-            'code' => 0,
-            'msg' => '获取成功',
-            'data' => [],
-        ];
-        $type = $request->get('type');
-        $action = $request->get('action');
+        $url = $request->get('url');
 
-        $desc = Cache::get("document::{$type}::{$action}");
-        return ['data' => $desc];
+        $model = ApiDoc::getByUrl($url);
+        if (empty($model)) {
+            return ['request_example' => '', 'response_example' => '', 'response_desc' => ''];
+        }
+
+        return [
+            'request_example' => $model->request_example,
+            'response_example' => $model->response_example,
+            'response_desc' => $model->response_desc,
+        ];
     }
 
     //获取路由分组配置信息
