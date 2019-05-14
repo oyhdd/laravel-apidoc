@@ -45,6 +45,7 @@ class ApiDoc extends Model
         $model = ApiDoc::where(['url' => $params['url']])->first();
         if (empty($model)) {
             $model = new ApiDoc();
+            $params['status'] = ApiDoc::STATUS_EFFECTIVE;
         }
         $model->fill($params);
         return $model->save();

@@ -54,7 +54,7 @@
                     <pre><span class="label label-primary"><?php echo $model->method(); ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model->uses() ? "<br/> <b>用途：{$model->uses()}</b>" : ''; ?>
                     </pre>
                     <ul class="tabs">
-                        <li class="active"><a href="#tab1">请求与返回</a></li>
+                        <li class="active"><a href="#tab1">接口文档</a></li>
                         <li><a href="#tab2">在线测试</a></li>
                     </ul>
                     <div class="tab_container">
@@ -92,7 +92,6 @@
                         <div id="tab2" class="tab_content" style="display: none; ">
                             <?php
                                 echo view('document::_debug', [
-                                    'syncHeader' => $syncHeader,
                                     'route'      => $debugRoute,
                                     'debugUrl'   => $debugUrl,
                                     'model'      => $model
@@ -108,7 +107,8 @@
                     <p><?php echo '@method'; ?> 请求方式, GET | POST</p>
                     <p>@header表示请求头，可空可多个，后面分别跟：类型|必须、参数名、备注</p>
                     <p>@param表示请求body，可空可多个，后面分别跟：类型|必须、参数名、备注</p>
-                    <pre>/**<br/>* @name    获取注册验证码<br/>* @uses    注册步骤一：手机号获取验证码<br/>* @author   wangmeng<br/>* <?php echo '@method'; ?>      POST<br/>* @header   string|true    $token     令牌校验<br/>* @param   &nbsp;string|true    $phone     手机号<br/>*/<br/>public function getSmsCode($phone)<br/>{<br/>}<br/></pre>
+                    <p>备注:目前已支持的类型包括：int,string,array,file</p>
+                    <pre>/**<br/> * @name &nbsp; 测试<br/> * @uses &nbsp; 测试接口<br/> * @author wangmeng<br/> * <?php    echo '@method'; ?> &nbsp;POST<br/> * @header&nbsp; string|true    $token              header头<br/> * @param &nbsp;string|true    $str                字符串<br/> * @param &nbsp;int|true       $number             数字<br/> * @param &nbsp;array|true     $arr                数组<br/> * @return&nbsp; array<br/> */<br/>public function test(Request $request)<br/>{<br/>}<br/></pre>
                     <h1>接口请求参数示例</h1>
                     <?php
                         echo view('document::_table', [
@@ -120,25 +120,23 @@
                             'values' => [['name' => 'phone', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '手机号']]
                         ]);
                     ?>
-                    <h1>错误码规范</h1>
-                    <table class="table table-condensed table-bordered table-striped table-hover request-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 160px;">错误码</th>
-                                <th style="width: 160px;">注释</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>0</td>
-                                <td>请求成功</td>
-                            </tr>
-                            <tr>
-                                <td>-1</td>
-                                <td>请求失败</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <h3>请求示例</h3>
+                    <textarea id="input_request_example" class="input-example" style="width:80%;overflow: scroll;"></textarea>
+                    <div class="form-group">
+                        <button name="request_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                    </div>
+
+                    <h3>返回示例</h3>
+                    <textarea id="input_response_example" class="input-example" style="width:80%; overflow: scroll;"></textarea>
+                    <div class="form-group">
+                        <button name="response_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                    </div>
+
+                    <h3>返回值说明</h3>
+                    <textarea id="input_response_desc" class="input-example" style="width:80%; overflow: scroll;"></textarea>
+                    <div class="form-group">
+                        <button name="response_desc" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
+                    </div>
                 <?php endif; ?>
 
             </div>
@@ -149,10 +147,6 @@
     <script type="text/javascript">
 
         var debugUrl = '<?php echo $debugUrl; ?>';
-        var request_method = '<?php echo $model->method(); ?>';
-        var author = '<?php echo $model->author(); ?>';
-        var uses = '<?php echo $model->uses(); ?>';
-        var title = '<?php echo $model->title(); ?>';
 
         $(document).ready(function() {
 
@@ -183,6 +177,10 @@
 
             //保存请求响应示例
             $('.submit-example').click(function(){
+                var request_method = '<?php echo !empty($model) ? $model->method() : ''; ?>';
+                var author = '<?php echo !empty($model) ? $model->author() : ''; ?>';
+                var uses = '<?php echo !empty($model) ? $model->uses() : ''; ?>';
+                var title = '<?php echo !empty($model) ? $model->title() : ''; ?>';
                 var type = $(this).attr('name');
 
                 var btn = $(this).button('loading');

@@ -86,7 +86,7 @@
     var uses = '<?php echo $model->uses(); ?>';
     var title = '<?php echo $model->title(); ?>';
     var debugUrl = '<?php echo $debugUrl; ?>';
-    var request_method = '<?php echo $model->method(); ?>';
+    var request_method;
     var testUnitData = {};
 
     $(function(){
@@ -94,6 +94,7 @@
         // autoLoadParams();
 
         $('#submit-btn').click(function(){
+            request_method = '<?php echo $model->method(); ?>';
 
             var form = new FormData();
             var processData = false;
@@ -243,9 +244,9 @@
                     title: title,
                     url: debugUrl,
                     method: request_method,
-                    header: header,
-                    body: data,
-                    response: response,
+                    header: JSON.stringify(header),
+                    body: JSON.stringify(data),
+                    response: JSON.stringify(response),
                     author: author,
                     uses: uses,
                 },
@@ -333,6 +334,7 @@
      */
     function autoLoadParams(test_unit_index) {
         $(".debug textarea").val("");
+        $(".debug input").val("");
         $("#save_title").val("");
         if (test_unit_index < 0) {
             $("#save_title").removeAttr("readonly");

@@ -102,10 +102,9 @@ class ApiController extends Controller
         $method = $request->get('method');
         if (empty($title)) {
             $ret['code'] = -1;
-            $ret['message'] = '请填写测试用例标题';
+            $ret['message'] = '请填写测试用例标题!';
             return $ret;
         }
-
         $this->uploadExample($request);
         $apidocModel = ApiDoc::getByUrl($url);
         $params = compact('title', 'header', 'body', 'response');

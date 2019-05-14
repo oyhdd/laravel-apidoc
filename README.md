@@ -2,7 +2,7 @@
 
 ## 一.安装
 
-### 1.在项目根目录下执行
+### 1.在项目根目录下执行
 
 ```
 composer require oyhdd/laravel-apidoc
@@ -24,78 +24,57 @@ php artisan vendor:publish --provider="Oyhdd\Document\DocumentServiceProvider" -
 ### 3.创建数据表
 ```
 php artisan migrate --path=./vendor/oyhdd/laravel-apidoc/src/database/migrations/
+
 ```
 
+备注：api_doc表存储接口相关信息，api_doc_params表存储接口的测试用例
+
+### 4.访问
 在浏览器打开{host}/document/api 后即可访问
 
 ## 二.使用方法
-### 1.控制器接口函数中按如下格式进行函数注释：
+### 1.控制器接口函数中按如下格式进行函数注释：
 
 ```java
-/**
- * @name    测试
- * @uses    测试
- * @author  wangmeng
- * @date    2017-08-07
- * @header  string|true           $token         令牌
- * @param   string|false          $name          姓名
- * @param   string|false          $mobile        手机号
- * @param   string|false          $id_card       身份证
- * @return  array
- */
-public function test(Request $request)
-{
-}
-```
+    /**
+     * @name   测试1
+     * @uses   测试接口
+     * @author wangmeng
+     * @date   2018-10-19
+     * @header string|true               $token              header头
+     * @param  string|true               $str                字符串
+     * @param  int|true                  $number             数字
+     * @param  array|true                $arr                数组
+     * @return array
+     */
+    public function test(Request $request)
+    {
+        $ret = [
+            'code' => 0,
+            'msg' => 'success',
+            'data' => [
+                'header' => ['token' => $request->header('token')],
+                'body' => $request->all(),
+            ],
+        ];
 
+        return $ret;
+    }
+```
+![](resource/pic1.png)
 ### 2.在routes/api.php中按如下格式配置路由：
 
 ```java
-//公共接口
-Route::name('公共接口.')->group(function ($router) {
-    $router->get('test/test', 'Back\TestController@test');
-});
-
-//后端接口
-Route::name('后端接口.')->namespace('Back')->prefix('back')->group(function ($router) {
-
-    $router->post('test/test5', 'TestController@test5');
-
-    //功能组1
-    $router->name('功能组1.')->group(function($router) {
-        $router->get('test/test1', 'TestController@test1');
-        $router->post('test/test4', 'TestController@test4');
-
-        //功能组1.1
-        $router->name('功能组1-1.')->group(function($router) {
-            $router->get('test/test6', 'TestController@test6');
-            $router->get('test/test7', 'TestController@test7');
-        });
+//测试示例接口
+Route::group([], function ($router) {
+    // 接口组
+    $router->name('测试.')->group(function ($router) {
+        $router->post('test', 'Oyhdd\Document\Controllers\TestController@test');
     });
-
-    //功能组2
-    $router->name('功能组2.')->group(function($router) {
-        $router->post('test/test2', 'TestController@test2');
-        $router->get('test/test3', 'TestController@test3');
-    });
-});
-
-//前端接口
-Route::name('前端接口.')->namespace('Front')->prefix('front')->group(function ($router) {
-
-    $router->get('test/test1', 'TestController@test1');
-
-    //功能组1
-    $router->name('功能组1.')->group(function($router) {
-        $router->get('test/test2', 'TestController@test2');
-    });
-
-    $router->get('test/test3', 'TestController@test3');
-
 });
 ```
 
-可通过name()和group()对路由接口进行菜单栏显示时分组，其中name()是对该组路由接口进行命名，若无name(),则该组下的接口都位于一级菜单中
+可通过name()和group()对路由接口进行菜单栏显示时分组，其中name()是对该组路由接口进行命名，若无name(),则该组下的接口都位于一级菜单中
 
 注意：name()中字符串参数以“.”结尾，若要自定义字符，则config/document.php中的delimiter也要同步修改
 
@@ -120,22 +99,17 @@ return [
 
     // 是否显示未配置路由的接口
     'showUndefinedRouter' => false,
-
-    // 各接口的header都自动同步为最新的header
-    'syncHeader' => true,
-
 ];
 ```
-各接口默认都会自动加载上次该接口填写过的参数（header和body）；若syncHeader = true，则所有接口都会自动加载最新的header
 
-### 4.返回示例与返回值说明待开发
-
-## 三.效果展示
-
-![](resource/pic1.png)
-
-
+### 4.接口文档
+- apidoc会根据函数注释自动解析为接口文档
+- 请求参数、请求示例、返回示例和返回值说明可以自行填写，数据保存在api_doc表中
 ![](resource/pic2.png)
 
-
+### 5.在线测试
+- 填写完相关参数后，可点击运行按钮进行接口测试，支持打印函数的输出，也支持dd(),dump()等函数
 ![](resource/pic3.png)
+
+- 运行成功后，可点击"保存用例"按钮保存测试用例,然后在测试用例下拉框中可看到所有的测试用例，也可以选择想要的测试用例来运行
+![](resource/pic4.png)

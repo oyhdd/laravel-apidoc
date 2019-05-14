@@ -40,19 +40,10 @@ class ApiDocParams extends Model
      */
     public static function saveApiParams($params)
     {
-        if (!empty($params['header'])) {
-            $params['header'] = json_encode($params['header']);
-        }
-        if (!empty($params['body'])) {
-            $params['body'] = json_encode($params['body']);
-        }
-        if (!empty($params['response'])) {
-            $params['response'] = json_encode($params['response']);
-        }
-
         $model = ApiDocParams::where(['api_id' => $params['api_id'], 'title' => $params['title']])->first();
         if (empty($model)) {
             $model = new ApiDocParams();
+            $params['status'] = ApiDocParams::STATUS_EFFECTIVE;
         }
         $params['response_md5'] = md5($params['response']);
         $model->fill($params);
