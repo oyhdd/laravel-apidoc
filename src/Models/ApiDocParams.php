@@ -11,7 +11,7 @@ class ApiDocParams extends Model
 
     protected $fillable = [
         'api_id',
-        'title',
+        'test_title',
         'header',
         'body',
         'response',
@@ -35,12 +35,12 @@ class ApiDocParams extends Model
 
     /**
      * @name   保存api接口测试用例
-     * @param  array      $params [api_id,title,header,body,response]
+     * @param  array      $params [api_id,test_title,header,body,response]
      * @return bool
      */
     public static function saveApiParams($params)
     {
-        $model = ApiDocParams::where(['api_id' => $params['api_id'], 'title' => $params['title']])->first();
+        $model = ApiDocParams::where(['api_id' => $params['api_id'], 'test_title' => $params['test_title']])->first();
         if (empty($model)) {
             $model = new ApiDocParams();
             $params['status'] = ApiDocParams::STATUS_EFFECTIVE;
@@ -57,7 +57,7 @@ class ApiDocParams extends Model
      */
     public static function getApiParams($api_id)
     {
-        $list = ApiDocParams::select(['id', 'title', 'header', 'body', 'response_md5'])
+        $list = ApiDocParams::select(['id', 'test_title', 'header', 'body', 'response_md5'])
             ->where(['api_id' => $api_id, 'status' => ApiDocParams::STATUS_EFFECTIVE])
             ->get()
             ->toArray();
@@ -78,5 +78,14 @@ class ApiDocParams extends Model
     public static function deleteApiParams($id)
     {
         return ApiDocParams::where(['id' => $id])->update(['status' => ApiDocParams::STATUS_INEFFECTIVE]);
+    }
+
+    public static function getByApiIds($apiDocIds)
+    {
+        return ApiDocParams::whereIn('api_id', $apiDocIds)
+            ->where(['status' => ApiDocParams::STATUS_EFFECTIVE])
+            ->get()
+            ->groupBy('api_id')
+            ->toArray();
     }
 }

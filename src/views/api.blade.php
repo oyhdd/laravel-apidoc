@@ -30,10 +30,30 @@
             table thead tr th{text-align: left;border: 1px solid #dddddd;background-color: #ddd;}
             table td{text-align: left;border: 1px solid #dddddd;vertical-align: inherit;}
             .submit-example{background: linear-gradient(to right, #2091cf, #0758f0);}
+            .regression-testing-content .panel{margin-bottom: 5px;}
         </style>
 
     </head>
     <body>
+        <!-- 模态弹出窗 -->
+        <div class="modal fade" id="mymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden='true' data-backdrop='static'>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel">回归测试</h3>
+                        <span class="modal-title" id="fail_count" style="float: right;margin-left: 5px"></span>
+                        <span class="modal-title" id="success_count" style="float: right;"></span>
+                    </div>
+                    <div id="regression_testing_detail" class="modal-body" style="padding: 0 15px;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button id="start_regression_test" type="button" class="btn btn-primary">开始测试</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div>
 
             <div class="col-md-3 col-sm-12">
@@ -48,9 +68,13 @@
                     <h1>
                         <?php echo $model->title(); ?>
                         <?php if ($model->author()): ?>
-                            <span style="font-size:16px;margin-left:20px;">— <?php echo $model->author(); ?></span>
+                            <span style="font-size:16px;margin-left:20px;">— <?php echo $model->author(); ?>
+                                <button id="regression_testing" type="button" data-toggle="modal" data-target="#mymodal" class="btn save-btn" style="float: right;">回归测试</button>
+                            </span>
+
                         <?php endif; ?>
                     </h1>
+
                     <pre><span class="label label-primary"><?php echo $model->method(); ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model->uses() ? "<br/> <b>用途：{$model->uses()}</b>" : ''; ?>
                     </pre>
                     <ul class="tabs">
@@ -147,8 +171,88 @@
     <script type="text/javascript">
 
         var debugUrl = '<?php echo $debugUrl; ?>';
+        var counter = 0;
+
 
         $(document).ready(function() {
+            //关闭回归测试面板
+            $('#mymodal').on('hide.bs.modal', function () {
+                $('#regression_testing_detail').empty();
+                $("#success_count").empty();
+                $("#fail_count").empty();
+            });
+
+            //回归测试
+            $('#start_regression_test').click(function () {
+                $('#regression_testing_detail').empty();
+                $("#success_count").empty();
+                $("#fail_count").empty();
+                $('#regression_testing_detail').append('正在进行回归测试，请勿关闭！');
+                $.ajax({
+                    url: '/document/regression-testing',
+                    type: 'POST',
+                    data: {},
+                    success: function(retData) {
+                        $('#regression_testing_detail').empty();
+                        if (retData.code == 0) {
+                            $("#success_count").html('<span class="label label-success">成功：'+ retData.data.success_count +'</span>');
+                            $("#fail_count").html('<span class="label label-danger">失败：'+ retData.data.fail_count +'</span>');
+                            var html = "";
+                            var list = retData.data.list;
+
+                            for (var i in list) {
+                                var temp = list[i];
+                                html += "<div class='regression-testing-content'><h3><span class='label label-primary'>"
+                                    + temp.title + "</span>&nbsp;<span class='label label-default'>"
+                                    + temp.url + "</span></h3>"
+                                for (var j in temp.list) {
+                                    var sub_temp = temp.list[j];
+
+                                    var success_status = '执行失败';
+                                    var success_class = "label label-danger";
+                                    if (sub_temp.success) {
+                                        success_status = '执行成功';
+                                        success_class = "label label-success";
+                                    }
+
+                                    var match_status = '结果不一致';
+                                    var match_class = "label label-danger";
+                                    if (sub_temp.match) {
+                                        match_status = '结果一致';
+                                        match_class = "label label-success";
+                                    }
+                                    counter += sub_temp.id;
+
+                                    var response = sub_temp.response
+                                    response = JSON.stringify(response);
+                                    response = js_beautify(response, 4, ' ');
+
+                                    html += "<div class='panel panel-default'><div class='panel-heading'>"
+                                        + "<h4 class='panel-title'>"
+                                        + "<span class='label label-info'>" + sub_temp.test_title + "</span>&nbsp;&nbsp;&nbsp;&nbsp;"
+                                        + "<span class='" + success_class +"'>" + success_status+ "</span>&nbsp;&nbsp;&nbsp;&nbsp;"
+                                        + "<span class='" + match_class +"'>" + match_status+ "</span>&nbsp;&nbsp;&nbsp;&nbsp;"
+                                        + "<a data-toggle='collapse' href='#collapse_" + counter + "'>"
+                                        + "<span class='label label-warning'>点击详情</span></a></h4></div>"
+                                        + "<div id='collapse_" + counter + "' class='panel-collapse collapse'>"
+                                        + "<div class='panel-body'>"
+                                        + "<pre><xmp>" + response + "</xmp></pre>"
+                                        +"</div></div></div>";
+                                }
+                                html += "</div><hr/>";
+                            }
+                            $('#regression_testing_detail').append(html);
+                        } else {
+                            $('#regression_testing_detail').append('回归测试失败,请重试！');
+                        }
+                    },
+                    error: function(retData) {
+                        $('#regression_testing_detail').empty();
+                        $('#regression_testing_detail').append('回归测试失败,请重试！');
+                    }
+                });
+            })
+
 
             //左侧菜单栏
             var menuConfig = {

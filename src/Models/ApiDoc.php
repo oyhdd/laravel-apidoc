@@ -58,6 +58,21 @@ class ApiDoc extends Model
      */
     public static function getByUrl($url)
     {
-        return ApiDoc::where(['url' => $url])->first();
+        return ApiDoc::where(['url' => $url, 'status' => ApiDoc::STATUS_EFFECTIVE])->first();
+    }
+
+    /**
+     * @name   获取所有数据
+     * @param  string      $url
+     * @return bool
+     */
+    public static function getAll($url = '')
+    {
+        $where = [];
+        if (!empty($url)) {
+            $where['url'] = $url;
+        }
+        $where['status'] = ApiDoc::STATUS_EFFECTIVE;
+        return ApiDoc::where($where)->get()->toArray();
     }
 }

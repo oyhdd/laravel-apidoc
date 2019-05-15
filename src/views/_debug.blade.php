@@ -6,6 +6,7 @@
     .delete-btn{width: 82px;margin: 20px 0; background: linear-gradient(to right, #f36565, #c55c5c);color: white;}
     .save-btn{width: 82px;background: linear-gradient(to right, #5dd03e, #5CB85C);color: white;}
 </style>
+
 <div class="container-fluid" style="padding:2%;">
     <div class="row">
 
@@ -90,8 +91,6 @@
     var testUnitData = {};
 
     $(function(){
-
-        // autoLoadParams();
 
         $('#submit-btn').click(function(){
             request_method = '<?php echo $model->method(); ?>';
@@ -225,13 +224,13 @@
 
         // 保存测试用例
         $('#save-btn').click(function(){
-            var title = $("#save_title").val();
+            var test_title = $("#save_title").val();
 
             if (!can_save) {
                 alert("请先提交测试并确保测试结果正确");
                 return;
             }
-            if (title == '') {
+            if (test_title == '') {
                 alert("请填写测试用例标题");
                 return;
             }
@@ -241,7 +240,7 @@
                 url: '/document/upload-api-params',
                 type: 'POST',
                 data: {
-                    title: title,
+                    test_title: test_title,
                     url: debugUrl,
                     method: request_method,
                     header: JSON.stringify(header),
@@ -317,7 +316,7 @@
                     if (retData.code == 0) {
                         testUnitData = retData.data;
                         for (var i in testUnitData) {
-                            $(".selectpicker").append("<option value='"+i+"'>"+testUnitData[i].title+"</option>")
+                            $(".selectpicker").append("<option value='"+i+"'>"+testUnitData[i].test_title+"</option>")
                         }
                     }
                     $('.selectpicker').selectpicker('refresh');
@@ -343,7 +342,7 @@
         }
         $("#delete-btn").css('display','inline');
         $("#save_title").attr("readonly","readonly");
-        $("#save_title").val(testUnitData[test_unit_index]['title']);
+        $("#save_title").val(testUnitData[test_unit_index]['test_title']);
         var data = testUnitData[test_unit_index];
         //加载当前接口的header和body
 

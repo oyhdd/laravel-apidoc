@@ -16,7 +16,7 @@ class CreateApiDocParamsTable extends Migration
         Schema::create('api_doc_params', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('api_id')->comment('接口id');
-            $table->string('title', 64)->comment('测试用例标题');
+            $table->string('test_title', 64)->comment('测试用例标题');
             $table->text('header')->nullable()->comment('header参数，json格式');
             $table->text('body')->nullable()->comment('body参数，json格式');
             $table->text('response')->nullable()->comment('返回值');
