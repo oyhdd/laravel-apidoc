@@ -44,7 +44,7 @@
         <div class="modal fade" id="mymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden='true' data-backdrop='static'>
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header" style="padding:15px 15px 5px;">
                         <h2 class="modal-title" id="myModalLabel">回归测试</h2>
                         <span class="label label-success" id="not_match_count" style="float: right;margin-left: 5px"></span>
                         <span class="label label-success" id="match_count" style="float: right;margin-left: 5px"></span>
