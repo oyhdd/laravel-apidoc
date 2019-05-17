@@ -14,7 +14,6 @@ class ApiDocParams extends Model
         'test_title',
         'header',
         'body',
-        'response',
         'response_md5',
     ];
 
@@ -35,7 +34,7 @@ class ApiDocParams extends Model
 
     /**
      * @name   保存api接口测试用例
-     * @param  array      $params [api_id,test_title,header,body,response]
+     * @param  array      $params [api_id,test_title,header,body,response_md5]
      * @return bool
      */
     public static function saveApiParams($params)
@@ -45,7 +44,6 @@ class ApiDocParams extends Model
             $model = new ApiDocParams();
             $params['status'] = ApiDocParams::STATUS_EFFECTIVE;
         }
-        $params['response_md5'] = md5($params['response']);
         $model->fill($params);
         return $model->save();
     }

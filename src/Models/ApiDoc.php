@@ -18,6 +18,7 @@ class ApiDoc extends Model
         'request_example',
         'response_example',
         'response_desc',
+        'regression_test',
         'status',
     ];
 
@@ -33,6 +34,13 @@ class ApiDoc extends Model
     public static $label_status = [
         self::STATUS_INEFFECTIVE => '无效',
         self::STATUS_EFFECTIVE   => '有效',
+    ];
+    // 回归测试状态
+    const STATUS_REG_TEST_NO  = 0;
+    const STATUS_REG_TEST_YES = 1;
+    public static $label_regression_test = [
+        self::STATUS_REG_TEST_NO => '否',
+        self::STATUS_REG_TEST_YES   => '是',
     ];
 
     /**

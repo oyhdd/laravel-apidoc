@@ -27,6 +27,7 @@ class CreateApiDocTable extends Migration
             $table->text('request_example')->nullable()->comment('请求示例');
             $table->text('response_example')->nullable()->comment('返回示例');
             $table->text('response_desc')->nullable()->comment('返回值说明');
+            $table->tinyInteger('regression_test')->default(0)->comment('是否回归测试：0否 1是');
             $table->tinyInteger('status')->default(1)->comment('状态, 0 : 无效 1 : 有效');
             $table->timestamp('create_time')->default(\DB::raw('CURRENT_TIMESTAMP'))->comment('创建时间');
 

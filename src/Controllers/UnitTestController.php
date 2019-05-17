@@ -20,8 +20,12 @@ class UnitTestController extends Controller
     public function uploadExample(Request $request)
     {
         $params = $request->all();
+
         if (!empty($params['type'])) {
             $params[$params['type']] = empty($params['value']) ? "" : $params['value'];
+        }
+        if (isset($params['regression_test'])) {
+            $params['regression_test'] = intval($params['regression_test']);
         }
         ApiDoc::saveApidoc($params);
         return [];
@@ -36,13 +40,14 @@ class UnitTestController extends Controller
 
         $model = ApiDoc::getByUrl($url);
         if (empty($model)) {
-            return ['request_example' => '', 'response_example' => '', 'response_desc' => ''];
+            return ['request_example' => '', 'response_example' => '', 'response_desc' => '', 'regression_test' => 0];
         }
 
         return [
             'request_example' => $model->request_example,
             'response_example' => $model->response_example,
             'response_desc' => $model->response_desc,
+            'regression_test' => $model->regression_test,
         ];
     }
 
@@ -59,7 +64,7 @@ class UnitTestController extends Controller
         $test_title = $request->get('test_title');
         $header = $request->get('header');
         $body = $request->get('body');
-        $response = $request->get('response');
+        $response_md5 = md5($request->get('response'));
         $url = $request->get('url');
         $method = $request->get('method');
         if (empty($test_title)) {
@@ -69,7 +74,7 @@ class UnitTestController extends Controller
         }
         $this->uploadExample($request);
         $apidocModel = ApiDoc::getByUrl($url);
-        $params = compact('test_title', 'header', 'body', 'response');
+        $params = compact('test_title', 'header', 'body', 'response_md5');
         $params['api_id'] = $apidocModel->id;
 
         if (!ApiDocParams::saveApiParams($params)) {
@@ -130,7 +135,7 @@ class UnitTestController extends Controller
     /**
      * 回归测试
      */
-    public function regressionTesting(Request $request)
+    public function regressionTest(Request $request)
     {
         $ret = [
             'code' => -1,
@@ -145,8 +150,12 @@ class UnitTestController extends Controller
         $apiParamsModels = ApiDocParams::getByApiIds($apiDocIds);
 
         foreach ($apiDocModels as $apiId => $apiDoc) {
-            $apiDocModels[$apiId]['api_params'] = empty($apiParamsModels[$apiId]) ? '' : $apiParamsModels[$apiId];
-            $apiDocs[$apiId] = $apiDoc;
+            if ($apiDoc['regression_test'] != ApiDoc::STATUS_REG_TEST_YES) {
+                unset($apiDocModels[$apiId]);
+            } else {
+                $apiDocModels[$apiId]['api_params'] = empty($apiParamsModels[$apiId]) ? '' : $apiParamsModels[$apiId];
+                $apiDocs[$apiId] = $apiDoc;
+            }
         }
         $ret['data'] = $this->sendRequest($apiDocModels);
         if (!empty($ret['data'])) {
@@ -168,6 +177,7 @@ class UnitTestController extends Controller
     public static function sendRequest($apiDocs = [], $timeOut = 60)
     {
         $requestData = [];
+        $total_api = $total_unit = $match_count = $not_match_count = $success_count = $fail_count = 0;
         $client = new Client(['timeout' => $timeOut]);
         foreach ($apiDocs as $apiId => $apiDoc) {
             if (in_array($apiDoc['method'], ["GET", "get"])) {
@@ -187,6 +197,7 @@ class UnitTestController extends Controller
                         'api_id' => $apiId,
                         'method' => "GET",
                     ];
+                    $total_unit ++;
                 }
             } elseif (in_array($apiDoc['method'], ["POST", "post"])) {
                 foreach ($apiDoc['api_params'] as $key => $apiParams) {
@@ -208,10 +219,12 @@ class UnitTestController extends Controller
                         'api_id' => $apiId,
                         'method' => "POST",
                     ];
+                    $total_unit ++;
                 }
             } else {
                 return false;
             }
+            $total_api ++;
         }
 
         $requests = function ($params) use ($client) {
@@ -256,7 +269,6 @@ class UnitTestController extends Controller
         $promise->wait();
 
         $ret = [];
-        $success_count = $fail_count = 0;
         foreach ($temp as $key => $response) {
             $api_id = $requestData[$key]['api_id'];
             $index = $requestData[$key]['key'];
@@ -268,10 +280,23 @@ class UnitTestController extends Controller
                 'response' => json_decode($response['response'], true)
             ];
 
-            if ($response['success'] && md5($response['response']) == $apiDocs[$api_id]['api_params'][$index]['response_md5']) {
-                $data['match'] = true;
+            if (!isset($ret['list'][$api_id]['not_match_count'])) {
+                $ret['list'][$api_id]['not_match_count'] = 0;
+            }
+            if (!isset($ret['list'][$api_id]['fail_count'])) {
+                $ret['list'][$api_id]['fail_count'] = 0;
+            }
+            if ($response['success']) {
+                if (md5($response['response']) == $apiDocs[$api_id]['api_params'][$index]['response_md5']) {
+                    $data['match'] = true;
+                    $match_count ++;
+                } else {
+                    $ret['list'][$api_id]['not_match_count'] ++;
+                    $not_match_count ++;
+                }
                 $success_count ++;
             } else {
+                $ret['list'][$api_id]['fail_count'] ++;
                 $fail_count ++;
             }
 
@@ -279,6 +304,11 @@ class UnitTestController extends Controller
             $ret['list'][$api_id]['url'] = $apiDocs[$api_id]['url'];
             $ret['list'][$api_id]['list'][] = $data;
         }
+
+        $ret['total_api'] = $total_api;
+        $ret['total_unit'] = $total_unit;
+        $ret['match_count'] = $match_count;
+        $ret['not_match_count'] = $not_match_count;
         $ret['success_count'] = $success_count;
         $ret['fail_count'] = $fail_count;
 

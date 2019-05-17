@@ -9,7 +9,7 @@ Route::get('document/get-example', 'Oyhdd\Document\Controllers\UnitTestControlle
 Route::post('document/upload-api-params', 'Oyhdd\Document\Controllers\UnitTestController@uploadApiParams');
 Route::get('document/get-api-params', 'Oyhdd\Document\Controllers\UnitTestController@getApiParams');
 Route::post('document/delete-api-params', 'Oyhdd\Document\Controllers\UnitTestController@deleteApiParams');
-Route::post('/document/regression-testing', 'Oyhdd\Document\Controllers\UnitTestController@regressionTesting');
+Route::post('/document/regression-test', 'Oyhdd\Document\Controllers\UnitTestController@regressionTest');
 
 //测试示例接口
 Route::group([], function ($router) {
