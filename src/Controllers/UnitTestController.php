@@ -153,7 +153,7 @@ class UnitTestController extends Controller
             if ($apiDoc['regression_test'] != ApiDoc::STATUS_REG_TEST_YES) {
                 unset($apiDocModels[$apiId]);
             } else {
-                $apiDocModels[$apiId]['api_params'] = empty($apiParamsModels[$apiId]) ? '' : $apiParamsModels[$apiId];
+                $apiDocModels[$apiId]['api_params'] = empty($apiParamsModels[$apiId]) ? [] : $apiParamsModels[$apiId];
                 $apiDocs[$apiId] = $apiDoc;
             }
         }

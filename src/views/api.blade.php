@@ -197,14 +197,17 @@
                 // 当开关状态改变时触发
                 onSwitchChange : function(event, state) {
                     var regression_test = state ? 1 : 0;
-                    console.log(1,should_switch)
                     if (should_switch) {
                         $.ajax({
                             url: '/document/upload-example',
                             type: 'POST',
                             data: {
                                 url: debugUrl,
-                                regression_test: regression_test
+                                regression_test: regression_test,
+                                method: '<?php echo !empty($model) ? $model->method() : ''; ?>',
+                                title: '<?php echo !empty($model) ? $model->title() : ''; ?>',
+                                author: '<?php echo !empty($model) ? $model->author() : ''; ?>',
+                                uses: '<?php echo !empty($model) ? $model->uses() : ''; ?>'
                             },
                             success: function(retData) {
                             },
