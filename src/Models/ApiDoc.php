@@ -72,7 +72,7 @@ class ApiDoc extends Model
     /**
      * @name   获取所有数据
      * @param  string      $url
-     * @return bool
+     * @return array
      */
     public static function getAll($url = '')
     {

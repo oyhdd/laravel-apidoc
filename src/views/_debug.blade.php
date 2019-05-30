@@ -322,7 +322,7 @@
                     $('.selectpicker').selectpicker('refresh');
                 },
                 error: function(retData) {
-                    alert('保存失败！')
+                    console.log('获取测试用例失败！')
                 }
             });
     }
