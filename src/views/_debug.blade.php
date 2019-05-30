@@ -241,6 +241,7 @@
                 type: 'POST',
                 data: {
                     test_title: test_title,
+                    title: title,
                     url: debugUrl,
                     method: request_method,
                     header: JSON.stringify(header),
