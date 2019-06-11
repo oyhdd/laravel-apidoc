@@ -8,9 +8,9 @@ return [
     // 不需展示的接口路由
     'hiddenMethods' => [
         // Controller::class
-        'App\Http\Controllers\TestController' => [
-            'test',//该Controller下的此action
-            '*',//该Controller下的所有action
+        'Oyhdd\Document\Controllers\TestController' => [
+            // 'test',//该Controller下的此action
+            // '*',//该Controller下的所有action
         ],
     ],
 

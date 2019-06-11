@@ -194,6 +194,10 @@
                 handleWidth:"15",//设置控件宽度
                 // 当开关状态改变时触发
                 onSwitchChange : function(event, state) {
+                    if (debugUrl == '') {
+                        alert("未配置路由");
+                        window.location.reload();
+                    }
                     var regression_test = state ? 1 : 0;
                     if (should_switch) {
                         $.ajax({
@@ -254,10 +258,10 @@
                             $("#match_count").html('匹配：'+ retData.data.match_count);
                             $("#not_match_count").html('不匹配：'+ retData.data.not_match_count);
                             if (retData.data.not_match_count > 0) {
-                                $("#not_match_count").toggleClass('label-danger');
+                                $("#not_match_count").addClass('label-danger');
                             }
                             if (retData.data.fail_count > 0) {
-                                $("#fail_count").toggleClass('label-danger');
+                                $("#fail_count").addClass('label-danger');
                             }
 
                             var html = "";
