@@ -72,7 +72,7 @@
                     <button id="save-btn" type="button" class="btn save-btn" data-loading-text="保存中..." autocomplete="off">保存用例</button>
                 </span>
             </div>
-            <pre id="ret">HTTP状态码：</br>请求时间：</pre>
+            <pre id="ret">HTTP状态码：</br>请求时间：</br>curl请求示例：</pre>
             <pre id="response">返回内容：</pre>
         </div>
 
@@ -168,7 +168,8 @@
                     }
                     var receiveDate = (new Date()).getTime();
                     btn.button('reset');
-                    $('#ret').html("HTTP状态码：200</br>请求时间："+(receiveDate - sendDate)+"ms");
+                    var curl_example = getCurlExample();
+                    $('#ret').html("HTTP状态码：200</br>请求时间：" + (receiveDate - sendDate) + "ms" + "</br>curl请求示例：" + curl_example);
                     $('#ret').css({
                         color: 'green',
                     });
@@ -199,7 +200,8 @@
                 error: function(retData) {
                     var receiveDate = (new Date()).getTime();
                     btn.button('reset');
-                    $('#ret').html("HTTP状态码：" + retData.status + "</br>请求时间："+(receiveDate - sendDate)+"ms");
+                    var curl_example = getCurlExample();
+                    $('#ret').html("HTTP状态码：" + retData.status + "</br>请求时间："+(receiveDate - sendDate)+"ms" + "</br>curl请求示例：" + curl_example);
                     $('#ret').css({
                         color: 'red',
                     });
@@ -333,6 +335,8 @@
      * @uses   header更新所有接口 body更新当前接口
      */
     function autoLoadParams(test_unit_index) {
+        var data = testUnitData[test_unit_index];
+
         $(".debug textarea").val("");
         $(".debug input").val("");
         $("#save_title").val("");
@@ -343,14 +347,12 @@
         }
         $("#delete-btn").css('display','inline');
         $("#save_title").attr("readonly","readonly");
-        $("#save_title").val(testUnitData[test_unit_index]['test_title']);
-        var data = testUnitData[test_unit_index];
+        $("#save_title").val(data['test_title']);
         //加载当前接口的header和body
-
-        for (var i in testUnitData[test_unit_index]['header']) {
+        for (var i in data['header']) {
             $("textarea[name='" + i + "'].form-control-header").val(data['header'][i]);
         }
-        for (var i in testUnitData[test_unit_index]['body']) {
+        for (var i in data['body']) {
             var cache = data['body'][i];
             if (cache instanceof Array) {
                 i = i.slice(0, -2);
@@ -358,5 +360,55 @@
             }
             $("textarea[name='" + i + "'].form-control-body").val(cache);
         }
+    }
+
+    /**
+     * @name   获取curl请求示例
+     * @uses   将当前请求参数转换为curl请求示例
+     */
+    function getCurlExample() {
+        var curl_example = '';
+        var test_unit_index = $('#selectpicker').val();
+        if (request_method == 'GET') {
+            curl_example += "curl -g " + debugUrl;
+            var index = 0;
+            for (var key in data) {
+                if (data[key] instanceof Array) {
+                    for (var i in data[key]) {
+                        if (index == 0) {
+                            curl_example += "?" + key + "=" + data[key][i];
+                        } else {
+                            curl_example += "\\&" + key + "=" + data[key][i];
+                        }
+                    }
+                } else {
+                    if (index == 0) {
+                        curl_example += "?" + key + "=" + data[key];
+                    } else {
+                        curl_example += "\\&" + key + "=" + data[key];
+                    }
+                }
+                index ++;
+            }
+            for (var key in header) {
+                curl_example += " -H '" + key + ": " + header[key] + "'";
+            }
+        } else if (request_method == 'POST') {
+            curl_example += "curl -X POST " + debugUrl;
+            for (var i in header) {
+                curl_example += " -H '" + i + ": " + header[i] + "'";
+            }
+            for (var key in data) {
+                if (data[key] instanceof Array) {
+                    for (var i in data[key]) {
+                        curl_example += " -F " + key + "=" + data[key][i];
+                    }
+                } else {
+                    curl_example += " -F " + key + "=" + data[key];
+                }
+            }
+        }
+
+        return curl_example;
     }
 </script>

@@ -19,6 +19,7 @@
 
         <title>在线测试API文档</title>
         <style>
+            body{margin: 10px}
             .TreeMenuList>div {margin: 5px;border: ridge;}
             .TreeMenuList {display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: flex; -webkit-box-orient: horizontal; -webkit-flex-direction: row;-moz-flex-direction: row;-ms-flex-direction: row;-o-flex-direction: row;flex-direction: row;}
 
@@ -104,19 +105,19 @@
                             ?>
 
                             <h3>请求示例</h3>
-                            <textarea id="input_request_example" class="input-example" style="width:80%;overflow: scroll;"></textarea>
+                            <textarea id="input_request_example" class="input-example" placeholder="请输入curl请求示例" style="width:100%;overflow: scroll;"></textarea>
                             <div class="form-group">
                                 <button name="request_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
                             </div>
 
                             <h3>返回示例</h3>
-                            <textarea id="input_response_example" class="input-example" style="width:80%;; min-height:300px;max-height:600px;overflow: scroll;"></textarea>
+                            <textarea id="input_response_example" class="input-example" placeholder="请输入返回示例" style="width:100%;; min-height:300px;max-height:600px;overflow: scroll;"></textarea>
                             <div class="form-group">
                                 <button name="response_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
                             </div>
 
                             <h3>返回值说明</h3>
-                            <textarea id="input_response_desc" class="input-example" style="width:80%; min-height:200px;max-height:600px;overflow: scroll;"></textarea>
+                            <textarea id="input_response_desc" class="input-example" placeholder="请输入返回值说明" style="width:100%; min-height:200px;max-height:600px;overflow: scroll;"></textarea>
                             <div class="form-group">
                                 <button name="response_desc" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
                             </div>
@@ -146,30 +147,27 @@
                     <?php
                         echo view('document::_table', [
                             'title'  => '请求头',
-                            'values' => [['name' => 'token', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '令牌校验']]
+                            'values' => [['name' => 'token', 'is_necessary' => 'true', 'type' => 'string', 'desc' => 'header头']]
                         ]);
                         echo view('document::_table', [
                             'title'  => '请求参数',
-                            'values' => [['name' => 'phone', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '手机号']]
+                            'values' => [
+                                ['name' => 'str', 'is_necessary' => 'true', 'type' => 'string', 'desc' => '字符串'],
+                                ['name' => 'number', 'is_necessary' => 'true', 'type' => 'int', 'desc' => '数字'],
+                                ['name' => 'arr', 'is_necessary' => 'true', 'type' => 'array', 'desc' => '数组'],
+                            ]
                         ]);
                     ?>
                     <h3>请求示例</h3>
-                    <textarea id="input_request_example" class="input-example" style="width:80%;overflow: scroll;"></textarea>
-                    <div class="form-group">
-                        <button name="request_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
-                    </div>
+                    <pre class="input-example" style="overflow: scroll;">curl -X POST http://dev.apidoc.com/test1 -H 'token: 1' -F str=2 -F number=3 -F arr[]=1 -F arr[]=1
+                    </pre>
 
                     <h3>返回示例</h3>
-                    <textarea id="input_response_example" class="input-example" style="width:80%; overflow: scroll;"></textarea>
-                    <div class="form-group">
-                        <button name="response_example" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
-                    </div>
+                    <pre class="input-example" style=" overflow: scroll;">{<br/>    "code": 0,<br/>    "msg": "success",<br/>    "data": {<br/>        "header": {<br/>            "token": "1"<br/>        },<br/>        "body": {<br/>            "str": "2",<br/>            "number": 3,<br/>            "arr": ["1", "1"]<br/>        }<br/>    }<br/>}
+                    </pre>
 
                     <h3>返回值说明</h3>
-                    <textarea id="input_response_desc" class="input-example" style="width:80%; overflow: scroll;"></textarea>
-                    <div class="form-group">
-                        <button name="response_desc" type="button" class="btn btn-primary submit-example" data-loading-text="保存中..." autocomplete="off">保存</button>
-                    </div>
+                    <pre class="input-example" style=" overflow: scroll;">token : header头<br/>str : 字符串<br/>number : 数字<br/>arr : 数组</pre>
                 <?php endif; ?>
 
             </div>

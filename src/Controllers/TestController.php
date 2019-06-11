@@ -25,7 +25,9 @@ class TestController extends Controller
             'code' => 0,
             'msg' => 'success',
             'data' => [
-                'header' => ['token' => $request->header('token')],
+                'header' => [
+                    'token' => $request->header('token')
+                ],
                 'body' => $request->all(),
             ],
         ];
@@ -54,7 +56,9 @@ class TestController extends Controller
             'code' => 0,
             'msg' => 'success',
             'data' => [
-                'header' => ['token' => $request->header('token')],
+                'header' => [
+                    'token' => $request->header('token')
+                ],
                 'body' => $request->all(),
             ],
         ];

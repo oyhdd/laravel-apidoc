@@ -15,6 +15,7 @@ class ApiDocParams extends Model
         'header',
         'body',
         'response_md5',
+        'status',
     ];
 
     const CREATED_AT = "create_time";
@@ -42,8 +43,8 @@ class ApiDocParams extends Model
         $model = ApiDocParams::where(['api_id' => $params['api_id'], 'test_title' => $params['test_title']])->first();
         if (empty($model)) {
             $model = new ApiDocParams();
-            $params['status'] = ApiDocParams::STATUS_EFFECTIVE;
         }
+        $params['status'] = ApiDocParams::STATUS_EFFECTIVE;
         $model->fill($params);
         return $model->save();
     }
