@@ -36,6 +36,8 @@
             table td{text-align: left;border: 1px solid #dddddd;vertical-align: inherit;}
             .submit-example{background: linear-gradient(to right, #2091cf, #0758f0);}
             #regression_testing_detail .panel{margin-bottom: 5px;}
+            .panel-title>.label{display: inline-block;}
+            .panel-title>.label-default{margin-right: 50px;}
         </style>
 
     </head>
@@ -46,17 +48,19 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header" style="padding:15px 15px 5px;">
-                        <h2 class="modal-title" id="myModalLabel">回归测试</h2>
+                        <h2 class="modal-title" id="myModalLabel">回归测试
+                            <span class="label label-default" id="total_api" style="font-size:12px;"></span>
+                            <span class="label label-default" id="total_unit" style="font-size:12px;margin-left: 5px"></span>
+                        </h2>
                         <span class="label label-success" id="not_match_count" style="float: right;margin-left: 5px"></span>
                         <span class="label label-success" id="match_count" style="float: right;margin-left: 5px"></span>
                         <span class="label label-success" id="fail_count" style="float: right;margin-left: 5px"></span>
-                        <span class="label label-success" id="success_count" style="float: right;margin-left: 5px"></span>
-                        <span class="label label-success" id="total_unit" style="float: right;margin-left: 5px"></span>
-                        <span class="label label-success" id="total_api" style="float: right;"></span>
+                        <span class="label label-success" id="success_count" style="float: right;"></span>
                     </div>
-                    <div id="regression_testing_detail" class="modal-body" >
+                    <div id="regression_testing_detail" class="modal-body" >测试所有接口保存的所有测试用例<br/>正在进行回归测试时可关闭面板，成功后也可查看！
                     </div>
                     <div class="modal-footer">
+                        <span id="start_regression_test_time" style="float: left;"></span>
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                         <button id="start_regression_test" type="button" class="btn btn-primary">开始测试</button>
                     </div>
@@ -225,30 +229,29 @@
 
             //关闭回归测试面板
             $('#mymodal').on('hide.bs.modal', function () {
-                $('#regression_testing_detail').empty();
-                $("#total_api").html("");
-                $("#total_unit").html("");
-                $("#match_count").html("");
-                $("#not_match_count").html("");
-                $("#success_count").html("");
-                $("#fail_count").html("");
             });
 
             //回归测试
             $('#start_regression_test').click(function () {
+                var btn = $(this).button('loading');
+                var regression_testing_btn = $('#regression_testing').button('loading');
                 $('#regression_testing_detail').empty();
+                $('#start_regression_test_time').empty();
                 $("#total_api").empty();
                 $("#total_unit").empty();
                 $("#match_count").empty();
                 $("#not_match_count").empty();
                 $("#success_count").empty();
                 $("#fail_count").empty();
-                $('#regression_testing_detail').append('正在进行回归测试，请勿关闭！');
+                $('#regression_testing_detail').append('正在进行回归测试，可稍后查看！');
                 $.ajax({
                     url: '/document/regression-test',
                     type: 'POST',
                     data: {},
                     success: function(retData) {
+                        btn.button('reset');
+                        regression_testing_btn.button('reset');
+                        $('#start_regression_test_time').append(getDate());
                         $('#regression_testing_detail').empty();
                         if (retData.code == 0) {
                             $("#total_api").html('接口：'+ retData.data.total_api);
@@ -313,10 +316,10 @@
                                     response = JSON.stringify(response);
                                     response = js_beautify(response, 4, ' ');
 
-                                    html += "<div class='panel panel-default'><div class='panel-heading'><h4 class='panel-title'>"
-                                        + "<span class='label label-info'>" + sub_temp.test_title + "</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class='"
-                                        + success_class +"'>" + success_status + "</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class='" + match_class + "'>"
-                                        + match_status+ "</span>&nbsp;&nbsp;&nbsp;&nbsp;<a data-toggle='collapse' href='#collapse_unit_test"
+                                    html += "<div class='panel panel-default'><div class='panel-heading' style='padding: 10px 5px;'><h4 class='panel-title'>"
+                                        + "<span class='label label-info'>" + sub_temp.test_title + "</span>&nbsp;&nbsp;<span class='"
+                                        + success_class +"'>" + success_status + "</span>&nbsp;&nbsp;<span class='" + match_class + "'>"
+                                        + match_status+ "</span>&nbsp;&nbsp;<a data-toggle='collapse' href='#collapse_unit_test"
                                         + sub_temp.id + "'><span class='label label-warning'>查看结果</span></a></h4></div><div id='collapse_unit_test"
                                         + sub_temp.id + "' class='panel-collapse collapse'><div class='panel-body'><pre><xmp>"
                                         + response + "</xmp></pre></div></div></div>";
@@ -333,6 +336,8 @@
                         }
                     },
                     error: function(retData) {
+                        btn.button('reset');
+                        regression_testing_btn.button('reset');
                         $('#regression_testing_detail').empty();
                         $('#regression_testing_detail').append('回归测试失败,请重试！');
                     }
@@ -402,6 +407,18 @@
                 });
             });
         });
+        
+        //获取当前时间，date格式
+        function getDate(){
+            var nowDate = new Date();
+            var year = nowDate.getFullYear();
+            var month = nowDate.getMonth() + 1 < 10 ? "0" + (nowDate.getMonth() + 1) : nowDate.getMonth() + 1;
+            var date = nowDate.getDate() < 10 ? "0" + nowDate.getDate() : nowDate.getDate();
+            var hour = nowDate.getHours()< 10 ? "0" + nowDate.getHours() : nowDate.getHours();
+            var minute = nowDate.getMinutes()< 10 ? "0" + nowDate.getMinutes() : nowDate.getMinutes();
+            var second = nowDate.getSeconds()< 10 ? "0" + nowDate.getSeconds() : nowDate.getSeconds();
+            return year + "-" + month + "-" + date+" "+hour+":"+minute+":"+second;
+        }
 
         //加载请求返回说明示例
         function renderExample() {
