@@ -31,7 +31,6 @@ class CreateApiDocTable extends Migration
             $table->tinyInteger('status')->default(1)->comment('状态, 0 : 无效 1 : 有效');
             $table->timestamp('create_time')->default(\DB::raw('CURRENT_TIMESTAMP'))->comment('创建时间');
 
-            $table->index('id');
             $table->index('url');
         });
     }
