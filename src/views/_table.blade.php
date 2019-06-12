@@ -9,8 +9,8 @@
         <thead>
             <tr>
                 <th>字段名</th>
-                <th style="width: 160px;">必须</th>
-                <th style="width: 160px;">类型</th>
+                <th>必须</th>
+                <th>类型</th>
                 <th>注释</th>
             </tr>
         </thead>
