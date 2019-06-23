@@ -10,11 +10,11 @@
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}?v=201808271719"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap-select.js') }}"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap-switch.min.js') }}"></script>
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap-select.css') }}">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap-switch.min.css') }}">
 
 
         <title>在线测试API文档</title>
@@ -37,7 +37,11 @@
             .submit-example{background: linear-gradient(to right, #2091cf, #0758f0);}
             #regression_testing_detail .panel{margin-bottom: 5px;}
             .panel-title>.label{display: inline-block;}
-            .panel-title>.label-default{margin-right: 50px;}
+            .panel-title>.label-default{margin-right: 5px;}
+            .glyphicon {top: 4px}
+            .bootstrap-switch .bootstrap-switch-handle-off, .bootstrap-switch .bootstrap-switch-handle-on, .bootstrap-switch .bootstrap-switch-label{
+                line-height: 12px
+            }
         </style>
 
     </head>
@@ -284,7 +288,7 @@
 
                                 html += "<div class='panel panel-default'><div class='panel-heading' style='background-color: #e9e9ec;'>"
                                     + "<h3 class='panel-title'><span class='label label-primary'>"
-                                    + temp.title + "</span>&nbsp;<span class='label label-default'>"
+                                    + temp.title + "</span>&nbsp;<span class='label label-info'>" + temp.method + "</span>&nbsp;&nbsp;<span class='label label-default'>"
                                     + temp.url + "</span>&nbsp;"
                                     + "<span class='" + fail_count_class + "'>失败："
                                     + temp.fail_count + "</span>&nbsp;"

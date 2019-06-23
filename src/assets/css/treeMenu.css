@@ -136,9 +136,9 @@
 
 .TreeMenu .TreeArrowDown {
 	/** 右边三角箭头的样式 **/
-	border-left: 6px solid transparent;
-	border-right: 6px solid transparent;
-	border-top: 10px solid darkgray;
+	border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid darkgray;
 	display: inline-block;
 	width: 0px;
 	height: 0px;
@@ -151,11 +151,11 @@
 
 .TreeMenu .Level.active .TreeArrowDown.rotate {
 	/** 选中当前菜单右边三角箭头逆时针旋转180度 **/
-	-webkit-transform: rotate(-180deg);
-	-moz-transform: rotate(-180deg);
-	-ms-transform: rotate(-180deg);
-	-o-transform: rotate(-180deg);
-	transform: rotate(-180deg);
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	transform: rotate(90deg);
 }
 
 .TreeMenu .Level .MenuBox {
