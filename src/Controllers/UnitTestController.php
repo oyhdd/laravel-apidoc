@@ -300,6 +300,7 @@ class UnitTestController extends Controller
                 $fail_count ++;
             }
 
+            $ret['list'][$api_id]['method'] = $requestData[$key]['method'];
             $ret['list'][$api_id]['title'] = $apiDocs[$api_id]['title'];
             $ret['list'][$api_id]['url'] = $apiDocs[$api_id]['url'];
             $ret['list'][$api_id]['list'][] = $data;
