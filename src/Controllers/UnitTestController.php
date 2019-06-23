@@ -64,7 +64,7 @@ class UnitTestController extends Controller
         $test_title = $request->get('test_title');
         $header = $request->get('header');
         $body = $request->get('body');
-        $response_md5 = md5($request->get('response'));
+        $response_md5 = md5(trim($request->get('response')));
         $url = $request->get('url');
         $method = $request->get('method');
         if (empty($test_title)) {
@@ -137,6 +137,7 @@ class UnitTestController extends Controller
      */
     public function regressionTest(Request $request)
     {
+        $auth = $request->header('Authorization');//网站auth认证
         $ret = [
             'code' => -1,
             'message' => '回归测试失败，请重试！',
@@ -157,7 +158,7 @@ class UnitTestController extends Controller
                 $apiDocs[$apiId] = $apiDoc;
             }
         }
-        $ret['data'] = $this->sendRequest($apiDocModels);
+        $ret['data'] = $this->sendRequest($apiDocModels, $auth);
         if (!empty($ret['data'])) {
             $ret['code'] = 0;
             $ret['message'] = '成功';
@@ -171,10 +172,11 @@ class UnitTestController extends Controller
      * @author wangmeng
      * @date   2019-05-15
      * @param  array        $apiDocs            apiDoc
+     * @param  string       $auth               网站auth认证
      * @param  integer      $timeOut            超时限制60s
      * @return false|array
      */
-    public static function sendRequest($apiDocs = [], $timeOut = 60)
+    public static function sendRequest($apiDocs = [], $auth = null, $timeOut = 120)
     {
         $requestData = [];
         $total_api = $total_unit = $match_count = $not_match_count = $success_count = $fail_count = 0;
@@ -189,6 +191,9 @@ class UnitTestController extends Controller
                             unset($body[$key1]);
                             $body[substr($key1, 0, -2)] = $value;
                         }
+                    }
+                    if (!empty($auth)) {
+                        $header['Authorization'] = $auth;
                     }
                     $requestData[] = [
                         'url' => $apiDoc['url']."?".http_build_query($body),
@@ -211,6 +216,9 @@ class UnitTestController extends Controller
                         }
                     }
 
+                    if (!empty($auth)) {
+                        $header['Authorization'] = $auth;
+                    }
                     $requestData[] = [
                         'url' => $apiDoc['url'],
                         'form_params' => $body,
@@ -287,7 +295,7 @@ class UnitTestController extends Controller
                 $ret['list'][$api_id]['fail_count'] = 0;
             }
             if ($response['success']) {
-                if (md5($response['response']) == $apiDocs[$api_id]['api_params'][$index]['response_md5']) {
+                if (md5(trim($response['response'])) == $apiDocs[$api_id]['api_params'][$index]['response_md5']) {
                     $data['match'] = true;
                     $match_count ++;
                 } else {
