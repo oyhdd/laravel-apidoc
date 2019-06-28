@@ -1,7 +1,7 @@
 {
     "name": "oyhdd/laravel-apidoc",
     "description": "自动生成在线测试接口和文档",
-    "keywords": ["package", "library"],
+    "keywords": ["package", "library", "laravel", "apidoc"],
     "license": "MIT",
     "type": "library",
     "authors": [
