@@ -19,6 +19,7 @@ class ApiDoc extends Model
         'response_example',
         'response_desc',
         'regression_test',
+        'regression_model',
         'status',
     ];
 
@@ -35,6 +36,7 @@ class ApiDoc extends Model
         self::STATUS_INEFFECTIVE => '无效',
         self::STATUS_EFFECTIVE   => '有效',
     ];
+
     // 回归测试状态
     const STATUS_REG_TEST_NO  = 0;
     const STATUS_REG_TEST_YES = 1;
@@ -43,9 +45,17 @@ class ApiDoc extends Model
         self::STATUS_REG_TEST_YES   => '是',
     ];
 
+    // 回归测试状态
+    const MODEL_REG_STRCIT  = 1;
+    const MODEL_REG_REQUEST = 2;
+    public static $label_regression_model = [
+        self::MODEL_REG_STRCIT  => '完全匹配',
+        self::MODEL_REG_REQUEST => '请求成功',
+    ];
+
     /**
      * @name   保存apidoc
-     * @param  array      $params [title,url,method,author,uses,request_example,response_example,response_desc,status]
+     * @param  array      $params
      * @return bool
      */
     public static function saveApidoc($params)

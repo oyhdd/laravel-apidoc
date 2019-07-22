@@ -10,11 +10,9 @@
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/treeMenu.js')}}?v=201808271719"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap.min.js') }}"></script>
         <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap-select.js') }}"></script>
-        <script type="text/javascript" src="{{ URL::asset('/vendor/document/js/bootstrap-switch.min.js') }}"></script>
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/treeMenu.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap-select.css') }}">
-        <link rel="stylesheet" href="{{ URL::asset('/vendor/document/css/bootstrap-switch.min.css') }}">
 
 
         <title>在线测试API文档</title>
@@ -56,8 +54,6 @@
                             <span class="label label-default" id="total_api" style="font-size:12px;"></span>
                             <span class="label label-default" id="total_unit" style="font-size:12px;margin-left: 5px"></span>
                         </h2>
-                        <span class="label label-success" id="not_match_count" style="float: right;margin-left: 5px"></span>
-                        <span class="label label-success" id="match_count" style="float: right;margin-left: 5px"></span>
                         <span class="label label-success" id="fail_count" style="float: right;margin-left: 5px"></span>
                         <span class="label label-success" id="success_count" style="float: right;"></span>
                     </div>
@@ -93,7 +89,7 @@
                         <?php endif; ?>
                     </h1>
 
-                    <pre><span class="label label-primary"><?php echo $model->method(); ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model->uses() ? "<br/><b>用途：{$model->uses()}</b>" : ''; ?><br/><br/><b>回归测试：</b><input id="save_reg_test" type="checkbox" class="checkbox"/>
+                    <pre><span class="label label-primary"><?php echo $model->method(); ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model->uses() ? "<br/><b>用途：{$model->uses()}</b>" : ''; ?><br/><br/><b>回归测试：</b><input id="save_reg_test" type="checkbox"/><br/><br/><b>完全匹配：</b><input type="radio" name="reg-model" value="1"/>&nbsp;<b>请求成功：</b><input type="radio" name="reg-model" value="2">
                     </pre>
                     <ul class="tabs">
                         <li class="active"><a href="#tab1">接口文档</a></li>
@@ -186,49 +182,17 @@
     <script type="text/javascript">
 
         var debugUrl = '<?php echo $debugUrl; ?>';
-        var counter = 0;
-        var should_switch = true;
-
 
         $(document).ready(function() {
 
             //是否加入回归测试
-            $("#save_reg_test").bootstrapSwitch({  
-                onText : "是",
-                offText : "否",
-                onColor : "success",
-                offColor : "danger",
-                size : "mini",    // 设置控件大小,从小到大  (mini/small/normal/large)
-                handleWidth:"15",//设置控件宽度
-                // 当开关状态改变时触发
-                onSwitchChange : function(event, state) {
-                    if (debugUrl == '') {
-                        alert("未配置路由");
-                        window.location.reload();
-                    }
-                    var regression_test = state ? 1 : 0;
-                    if (should_switch) {
-                        $.ajax({
-                            url: '/document/upload-example',
-                            type: 'POST',
-                            data: {
-                                url: debugUrl,
-                                regression_test: regression_test,
-                                method: '<?php echo !empty($model) ? $model->method() : ''; ?>',
-                                title: '<?php echo !empty($model) ? $model->title() : ''; ?>',
-                                author: '<?php echo !empty($model) ? $model->author() : ''; ?>',
-                                uses: '<?php echo !empty($model) ? $model->uses() : ''; ?>'
-                            },
-                            success: function(retData) {
-                            },
-                            error: function(retData) {
-                                alert('保存失败');
-                            }
-                        });
-                    }
+            $("#save_reg_test").click(function () {
+                uploadExample();
+            });
 
-                    should_switch = true;
-                }
+            //是否加入回归测试
+            $(":radio[name=reg-model]").click(function () {
+                uploadExample();
             });
 
             //关闭回归测试面板
@@ -243,8 +207,6 @@
                 $('#start_regression_test_time').empty();
                 $("#total_api").empty();
                 $("#total_unit").empty();
-                $("#match_count").empty();
-                $("#not_match_count").empty();
                 $("#success_count").empty();
                 $("#fail_count").empty();
                 $('#regression_testing_detail').append('正在进行回归测试，可稍后查看！');
@@ -260,13 +222,8 @@
                         if (retData.code == 0) {
                             $("#total_api").html('接口：'+ retData.data.total_api);
                             $("#total_unit").html('用例：'+ retData.data.total_unit);
-                            $("#success_count").html('请求成功：'+ retData.data.success_count);
-                            $("#fail_count").html('请求失败：'+ retData.data.fail_count);
-                            $("#match_count").html('匹配：'+ retData.data.match_count);
-                            $("#not_match_count").html('不匹配：'+ retData.data.not_match_count);
-                            if (retData.data.not_match_count > 0) {
-                                $("#not_match_count").addClass('label-danger');
-                            }
+                            $("#success_count").html('成功：'+ retData.data.success_count);
+                            $("#fail_count").html('失败：'+ retData.data.fail_count);
                             if (retData.data.fail_count > 0) {
                                 $("#fail_count").addClass('label-danger');
                             }
@@ -281,10 +238,6 @@
                                 if (temp.fail_count > 0) {
                                     fail_count_class = 'label label-danger';
                                 }
-                                var not_match_count_class = 'label label-success';
-                                if (temp.not_match_count > 0) {
-                                    not_match_count_class = 'label label-danger';
-                                }
 
                                 html += "<div class='panel panel-default'><div class='panel-heading' style='background-color: #e9e9ec;'>"
                                     + "<h3 class='panel-title'><span class='label label-primary'>"
@@ -292,8 +245,6 @@
                                     + temp.url + "</span>&nbsp;"
                                     + "<span class='" + fail_count_class + "'>失败："
                                     + temp.fail_count + "</span>&nbsp;"
-                                    + "<span class='" + not_match_count_class + "'>不匹配："
-                                    + temp.not_match_count + "</span>&nbsp;"
                                     + "<a data-toggle='collapse' href='#collapse_api_" + i + "'>"
                                     + "<span  class='collapse_click glyphicon glyphicon-chevron-right'></span></a>"
                                     + "</h3></div><div id='collapse_api_" + i + "' class='panel-collapse collapse'><div class='panel-body'>";
@@ -301,20 +252,12 @@
                                 for (var j in temp.list) {
                                     var sub_temp = temp.list[j];
 
-                                    var success_status = '请求失败';
+                                    var success_status = '失败';
                                     var success_class = "label label-danger";
                                     if (sub_temp.success) {
-                                        success_status = '请求成功';
+                                        success_status = '成功';
                                         success_class = "label label-success";
                                     }
-
-                                    var match_status = '结果不一致';
-                                    var match_class = "label label-danger";
-                                    if (sub_temp.match) {
-                                        match_status = '结果一致';
-                                        match_class = "label label-success";
-                                    }
-                                    counter += sub_temp.id;
 
                                     var response = sub_temp.response
                                     response = JSON.stringify(response);
@@ -322,8 +265,7 @@
 
                                     html += "<div class='panel panel-default'><div class='panel-heading' style='padding: 10px 5px;'><h4 class='panel-title'>"
                                         + "<span class='label label-info'>" + sub_temp.test_title + "</span>&nbsp;&nbsp;<span class='"
-                                        + success_class +"'>" + success_status + "</span>&nbsp;&nbsp;<span class='" + match_class + "'>"
-                                        + match_status+ "</span>&nbsp;&nbsp;<a data-toggle='collapse' href='#collapse_unit_test"
+                                        + success_class +"'>" + success_status + "</span>&nbsp;&nbsp;<a data-toggle='collapse' href='#collapse_unit_test"
                                         + sub_temp.id + "'><span class='label label-warning'>查看结果</span></a></h4></div><div id='collapse_unit_test"
                                         + sub_temp.id + "' class='panel-collapse collapse'><div class='panel-body'><pre><xmp>"
                                         + response + "</xmp></pre></div></div></div>";
@@ -412,6 +354,27 @@
             });
         });
         
+        function uploadExample() {                        
+            $.ajax({
+                url: '/document/upload-example',
+                type: 'POST',
+                data: {
+                    url: debugUrl,
+                    regression_test: Number($("#save_reg_test").prop('checked')),
+                    regression_model: $(":radio[name=reg-model]:checked").val(),
+                    method: '<?php echo !empty($model) ? $model->method() : ''; ?>',
+                    title: '<?php echo !empty($model) ? $model->title() : ''; ?>',
+                    author: '<?php echo !empty($model) ? $model->author() : ''; ?>',
+                    uses: '<?php echo !empty($model) ? $model->uses() : ''; ?>'
+                },
+                success: function(retData) {
+                },
+                error: function(retData) {
+                    alert('保存失败');
+                }
+            });
+        }
+        
         //获取当前时间，date格式
         function getDate(){
             var nowDate = new Date();
@@ -434,9 +397,9 @@
                 },
                 success: function(retData) {
                     if (retData.regression_test == 1) {
-                        should_switch = false;
-                        $('#save_reg_test').bootstrapSwitch('toggleState');
+                        $("#save_reg_test").prop("checked", true);
                     }
+                    $("input:radio[value='"+retData.regression_model+"']").attr('checked','true');
 
                     for (var i in retData) {
                         $('#input_'+i).html(retData[i]);

@@ -27,6 +27,9 @@ class UnitTestController extends Controller
         if (isset($params['regression_test'])) {
             $params['regression_test'] = intval($params['regression_test']);
         }
+        if (isset($params['regression_model'])) {
+            $params['regression_model'] = intval($params['regression_model']);
+        }
         ApiDoc::saveApidoc($params);
         return [];
     }
@@ -48,6 +51,7 @@ class UnitTestController extends Controller
             'response_example' => $model->response_example,
             'response_desc' => $model->response_desc,
             'regression_test' => $model->regression_test,
+            'regression_model' => $model->regression_model,
         ];
     }
 
@@ -201,6 +205,7 @@ class UnitTestController extends Controller
                         'key' => $key,
                         'api_id' => $apiId,
                         'method' => "GET",
+                        'regression_model' => $apiDoc["regression_model"],
                     ];
                     $total_unit ++;
                 }
@@ -226,6 +231,7 @@ class UnitTestController extends Controller
                         'key' => $key,
                         'api_id' => $apiId,
                         'method' => "POST",
+                        'regression_model' => $apiDoc["regression_model"],
                     ];
                     $total_unit ++;
                 }
@@ -280,28 +286,26 @@ class UnitTestController extends Controller
         foreach ($temp as $key => $response) {
             $api_id = $requestData[$key]['api_id'];
             $index = $requestData[$key]['key'];
+            $success = false;
+            if ($response['success']) {
+                //完全匹配
+                if ($requestData[$key]['regression_model'] == ApiDoc::MODEL_REG_STRCIT) {
+                    $success = (md5(trim($response['response'])) == $apiDocs[$api_id]['api_params'][$index]['response_md5']);
+                } elseif ($requestData[$key]['regression_model'] == ApiDoc::MODEL_REG_REQUEST) {
+                    $success = true;
+                }
+            }
             $data = [
                 'id' => $apiDocs[$api_id]['api_params'][$index]['id'],
-                'success' => $response['success'],
+                'success' => $success,
                 'test_title' => $apiDocs[$api_id]['api_params'][$index]['test_title'],
-                'match' => false,
                 'response' => json_decode($response['response'], true)
             ];
 
-            if (!isset($ret['list'][$api_id]['not_match_count'])) {
-                $ret['list'][$api_id]['not_match_count'] = 0;
-            }
             if (!isset($ret['list'][$api_id]['fail_count'])) {
                 $ret['list'][$api_id]['fail_count'] = 0;
             }
-            if ($response['success']) {
-                if (md5(trim($response['response'])) == $apiDocs[$api_id]['api_params'][$index]['response_md5']) {
-                    $data['match'] = true;
-                    $match_count ++;
-                } else {
-                    $ret['list'][$api_id]['not_match_count'] ++;
-                    $not_match_count ++;
-                }
+            if ($success) {
                 $success_count ++;
             } else {
                 $ret['list'][$api_id]['fail_count'] ++;
@@ -316,8 +320,6 @@ class UnitTestController extends Controller
 
         $ret['total_api'] = $total_api;
         $ret['total_unit'] = $total_unit;
-        $ret['match_count'] = $match_count;
-        $ret['not_match_count'] = $not_match_count;
         $ret['success_count'] = $success_count;
         $ret['fail_count'] = $fail_count;
 
