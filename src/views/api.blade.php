@@ -132,7 +132,8 @@
                                 echo view('document::_debug', [
                                     'route'      => $debugRoute,
                                     'debugUrl'   => $debugUrl,
-                                    'model'      => $model
+                                    'model'      => $model,
+                                    'localApi'   => $localApi,
                                 ]);
                             ?>
                         </div>

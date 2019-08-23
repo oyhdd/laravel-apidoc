@@ -87,6 +87,7 @@
     var uses = '<?php echo $model['uses']; ?>';
     var title = '<?php echo $model['title']; ?>';
     var debugUrl = '<?php echo $debugUrl; ?>';
+    var localApi = '<?php echo $localApi; ?>';
     var request_method;
     var testUnitData = {};
 
@@ -152,76 +153,151 @@
                 processData = true;
                 contentType = true;
             }
-            $.ajax({
-                url: debugUrl,
-                type: request_method,
-                headers: header,
-                data: form,
-                processData:processData,
-                contentType:contentType,
-                success: function(retData) {
-                    can_save = true;
-                    response = retData;
+            if (localApi) {
+                $.ajax({
+                    url: debugUrl,
+                    type: request_method,
+                    headers: header,
+                    data: form,
+                    processData:processData,
+                    contentType:contentType,
+                    success: function(retData) {
+                        can_save = true;
+                        response = retData;
 
-                    if (typeof retData === 'string') {
-                        retData = $.trim(retData);
-                    }
-                    var receiveDate = (new Date()).getTime();
-                    btn.button('reset');
-                    var curl_example = getCurlExample();
-                    $('#ret').html("HTTP状态码：200</br>请求时间：" + (receiveDate - sendDate) + "ms" + "</br>curl请求示例：" + curl_example);
-                    $('#ret').css({
-                        color: 'green',
-                    });
-                    if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
-                        for (key in data) {
-                            debugUrl += key + '=' + data[key] + '&';
+                        if (typeof retData === 'string') {
+                            retData = $.trim(retData);
                         }
-                        window.open(debugUrl);
-                        $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
-                    } else {
-                        if (typeof retData == 'object') {
-                            retData = JSON.stringify(retData);
-                            var formatText = js_beautify(retData, 4, ' ');
-                        } else if (retData.indexOf('<script> Sfdump = window.Sfdump') != -1) {
-                            var formatText = retData;
-                        } else if (typeof retData === 'string') {
-                            //防中文乱码
-                            retData = eval("("+retData+")")
-                            retData = JSON.stringify(retData);
-                            var formatText = js_beautify(retData, 4, ' ');
+                        var receiveDate = (new Date()).getTime();
+                        btn.button('reset');
+                        var curl_example = getCurlExample();
+                        $('#ret').html("HTTP状态码：200</br>请求时间：" + (receiveDate - sendDate) + "ms" + "</br>curl请求示例：" + curl_example);
+                        $('#ret').css({
+                            color: 'green',
+                        });
+                        if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
+                            for (key in data) {
+                                debugUrl += key + '=' + data[key] + '&';
+                            }
+                            window.open(debugUrl);
+                            $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
                         } else {
-                            var formatText = retData;
-                        }
+                            if (typeof retData == 'object') {
+                                retData = JSON.stringify(retData);
+                                var formatText = js_beautify(retData, 4, ' ');
+                            } else if (retData.indexOf('<script> Sfdump = window.Sfdump') != -1) {
+                                var formatText = retData;
+                            } else if (typeof retData === 'string') {
+                                //防中文乱码
+                                retData = eval("("+retData+")")
+                                retData = JSON.stringify(retData);
+                                var formatText = js_beautify(retData, 4, ' ');
+                            } else {
+                                var formatText = retData;
+                            }
 
-                        $('#response').html(formatText);
-                    }
-                },
-                error: function(retData) {
-                    var receiveDate = (new Date()).getTime();
-                    btn.button('reset');
-                    var curl_example = getCurlExample();
-                    $('#ret').html("HTTP状态码：" + retData.status + "</br>请求时间："+(receiveDate - sendDate)+"ms" + "</br>curl请求示例：" + curl_example);
-                    $('#ret').css({
-                        color: 'red',
-                    });
-                    if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
-                        for (key in data) {
-                            debugUrl += key + '=' + data[key] + '&';
+                            $('#response').html(formatText);
                         }
-                        window.open(debugUrl);
-                        $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
-                    } else {
-                        if (retData.responseText.indexOf('<script> Sfdump = window.Sfdump') != -1) {
-                            var formatText = retData.responseText;
-                        } else if (typeof retData == 'object') {
-                            retData = JSON.stringify(retData);
-                            var formatText = js_beautify(retData, 4, ' ');
+                    },
+                    error: function(retData) {
+                        var receiveDate = (new Date()).getTime();
+                        btn.button('reset');
+                        var curl_example = getCurlExample();
+                        $('#ret').html("HTTP状态码：" + retData.status + "</br>请求时间："+(receiveDate - sendDate)+"ms" + "</br>curl请求示例：" + curl_example);
+                        $('#ret').css({
+                            color: 'red',
+                        });
+                        if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
+                            for (key in data) {
+                                debugUrl += key + '=' + data[key] + '&';
+                            }
+                            window.open(debugUrl);
+                            $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
+                        } else {
+                            if (retData.responseText.indexOf('<script> Sfdump = window.Sfdump') != -1) {
+                                var formatText = retData.responseText;
+                            } else if (typeof retData == 'object') {
+                                retData = JSON.stringify(retData);
+                                var formatText = js_beautify(retData, 4, ' ');
+                            }
+                            $('#response').html(formatText);
                         }
-                        $('#response').html(formatText);
                     }
-                }
-            });
+                });
+            } else {
+                $.ajax({
+                    url: '/document/test',
+                    type: 'POST',
+                    data: {
+                        debugUrl: debugUrl,
+                        method: request_method,
+                        header: JSON.stringify(header),
+                        body: JSON.stringify(data)
+                    },
+                    success: function(retData) {
+                        can_save = true;
+                        response = retData;
+
+                        if (typeof retData === 'string') {
+                            retData = $.trim(retData);
+                        }
+                        var receiveDate = (new Date()).getTime();
+                        btn.button('reset');
+                        var curl_example = getCurlExample();
+                        $('#ret').html("HTTP状态码：200</br>请求时间：" + (receiveDate - sendDate) + "ms" + "</br>curl请求示例：" + curl_example);
+                        $('#ret').css({
+                            color: 'green',
+                        });
+                        if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
+                            for (key in data) {
+                                debugUrl += key + '=' + data[key] + '&';
+                            }
+                            window.open(debugUrl);
+                            $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
+                        } else {
+                            if (typeof retData == 'object') {
+                                retData = JSON.stringify(retData);
+                                var formatText = js_beautify(retData, 4, ' ');
+                            } else if (retData.indexOf('<script> Sfdump = window.Sfdump') != -1) {
+                                var formatText = retData;
+                            } else if (typeof retData === 'string') {
+                                //防中文乱码
+                                retData = eval("("+retData+")")
+                                retData = JSON.stringify(retData);
+                                var formatText = js_beautify(retData, 4, ' ');
+                            } else {
+                                var formatText = retData;
+                            }
+
+                            $('#response').html(formatText);
+                        }
+                    },
+                    error: function(retData) {
+                        var receiveDate = (new Date()).getTime();
+                        btn.button('reset');
+                        var curl_example = getCurlExample();
+                        $('#ret').html("HTTP状态码：" + retData.status + "</br>请求时间："+(receiveDate - sendDate)+"ms" + "</br>curl请求示例：" + curl_example);
+                        $('#ret').css({
+                            color: 'red',
+                        });
+                        if (typeof retData === 'string' && retData.indexOf('content="text/html;') != -1) {
+                            for (key in data) {
+                                debugUrl += key + '=' + data[key] + '&';
+                            }
+                            window.open(debugUrl);
+                            $('#response').html('该接口是返回html页面，请允许浏览器弹出新页面或自行在浏览器调试');
+                        } else {
+                            if (retData.responseText.indexOf('<script> Sfdump = window.Sfdump') != -1) {
+                                var formatText = retData.responseText;
+                            } else if (typeof retData == 'object') {
+                                retData = JSON.stringify(retData);
+                                var formatText = js_beautify(retData, 4, ' ');
+                            }
+                            $('#response').html(formatText);
+                        }
+                    }
+                });
+            }
         });
 
         // 保存测试用例
