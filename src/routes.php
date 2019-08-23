@@ -10,6 +10,8 @@ Route::post('document/upload-api-params', 'Oyhdd\Document\Controllers\UnitTestCo
 Route::get('document/get-api-params', 'Oyhdd\Document\Controllers\UnitTestController@getApiParams');
 Route::post('document/delete-api-params', 'Oyhdd\Document\Controllers\UnitTestController@deleteApiParams');
 Route::post('/document/regression-test', 'Oyhdd\Document\Controllers\UnitTestController@regressionTest');
+Route::post('/document/test', 'Oyhdd\Document\Controllers\UnitTestController@test');
+Route::post('/document/visual-code', 'Oyhdd\Document\Controllers\VisualCodeController@visualCode');
 
 //测试示例接口
 Route::group([], function ($router) {

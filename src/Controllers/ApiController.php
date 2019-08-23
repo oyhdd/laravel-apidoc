@@ -4,8 +4,8 @@ namespace Oyhdd\Document\Controllers;
 use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Config;
 use Oyhdd\Document\Models\ActionModel;
+use GuzzleHttp\Client;
 
 /**
  * Document controller
@@ -24,12 +24,14 @@ class ApiController extends Controller
     protected $actionModel;//当前请求的接口详情类
     protected $debugRoute;//当前请求的路由(不含host)
     protected $debugUrl;//当前请求的完整路由(包含host)
+    protected $visualRoute;//用于可视化分析的接口（当前接口）
+    protected $project;    //当前请求的项目
 
     function __construct()
     {
-        $this->delimiter = !is_null(Config::get('document.delimiter')) ? Config::get('document.delimiter') : '.';
-        $this->hiddenMethods = !is_null(Config::get('document.hiddenMethods')) ? Config::get('document.hiddenMethods') : [];
-        $this->showUndefinedRouter = !is_null(Config::get('document.showUndefinedRouter')) ? Config::get('document.showUndefinedRouter') : false;
+        $this->delimiter = !is_null(config('document.delimiter')) ? config('document.delimiter') : '.';
+        $this->hiddenMethods = !is_null(config('document.hiddenMethods')) ? config('document.hiddenMethods') : [];
+        $this->showUndefinedRouter = !is_null(config('document.showUndefinedRouter')) ? config('document.showUndefinedRouter') : false;
     }
 
     /**
@@ -40,7 +42,39 @@ class ApiController extends Controller
         //获取host和action
         $this->host = str_replace($request->path(), '', $request->url());
         $this->action = $request->get('action');
+        $this->project = $request->get('project', 'local');
+        $class = $request->get('class');
 
+        // 本地接口
+        $result = $this->getLocalApi();
+
+        $otherApi = config('document.otherApi', []);
+        foreach ($otherApi as $project => $api) {
+            $resultApi = $this->getOtherApi($api, $this->action);
+            if (!empty($resultApi['navItems'])) {
+                $result['navItems'][] = [
+                    'name' => "外部接口:".$project,
+                    'href' => '',
+                    'action' => '',
+                    'subMenus' => $resultApi['navItems'],
+                ];
+            }
+
+            if ($this->project == $project) {
+                $result['debugRoute'] = $resultApi['debugRoute'];
+                $result['debugUrl'] = $resultApi['debugUrl'];
+                $result['debugUrl'] = $resultApi['debugUrl'];
+                $result['model'] = $resultApi['model'];
+            }
+        }
+        $result['localApi'] = ($this->project == 'local');
+        return view('document::api', $result);
+
+    }
+
+    // 获取本地接口
+    public function getLocalApi()
+    {
         //获取路由分组
         $routeList = $this->getRouteGroupList();
 
@@ -59,12 +93,43 @@ class ApiController extends Controller
             $navItems[] = $this->handleUndefinedRouter();
         }
 
-        return view('document::api', [
+        return [
             'navItems' => $navItems,
-            'model' => $this->actionModel,
+            'model' => empty($this->actionModel) ? [] : $this->actionModel->getAll(),
             'debugRoute' => $this->debugRoute,
             'debugUrl' => $this->debugUrl,
-        ]);
+            'visualRoute' => $this->visualRoute,
+        ];
+    }
+
+    public function getOtherApi($url, $action = '')
+    {
+        try {
+            $client = new Client();
+            if (!empty($action)) {
+                $url .= '?action='.$action;
+            }
+
+            $response = $client->request('GET', $url);
+            $content = $response->getBody()->getContents();
+            $result = @json_decode($content, true);
+            if (!isset($result['code']) || $result['code'] != 0) {
+                $result = [];
+            } else {
+                $result = $result['data'];
+            }
+        } catch (\Exception $e) {
+        }
+        if (empty($result)) {
+            $result = [
+                'navItems' => [],
+                'model' => [],
+                'debugRoute' => '',
+                'debugUrl' => '',
+            ];
+        }
+
+        return $result;
     }
 
     //获取路由分组配置信息
@@ -242,7 +307,7 @@ class ApiController extends Controller
                             $this->debugRoute = '';
                         }
                         $active = true;
-
+                        $this->visualRoute = addslashes($class.$this->delimiter.$method->name);
                         $cur_method = $this->getMethod($route['methods']);
                         if (!empty($cur_method)) {
                             $actionModel->setMethod($cur_method);
@@ -254,7 +319,7 @@ class ApiController extends Controller
                 $subMenu = [
                     'name' => $actionModel->title(),
                     'uri' => empty($route['href']) ? '' : $route['href'],
-                    'href' => '/document/api?action='.$class.$this->delimiter.$method->name,
+                    'href' => '/document/api?project=local&action='.$class.$this->delimiter.$method->name,
                     'active' => $active,
                 ];
                 break;

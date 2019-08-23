@@ -136,6 +136,37 @@ class UnitTestController extends Controller
         return $ret;
     }
 
+    public function test(Request $request)
+    {
+        $debugUrl = $request->get('debugUrl', '');
+        $method = strtoupper($request->get('method', ''));
+        $header = json_decode($request->get('header', []), true);
+        $body = json_decode($request->get('body', []), true);
+
+        try {
+            $client = new Client();
+            $options = empty($header) ? [] : ['headers' => $header];
+            if ($method == 'GET') {
+                $url = $debugUrl.'?'.http_build_query($body);
+                $response = $client->request('GET', $url, $options);
+                $content = $response->getBody()->getContents();
+            } else {
+                $options['headers']['Accept'] = 'application/json';
+                $options['headers']['Content-type'] = 'application/json';
+                $response = $client->request('POST', $debugUrl, [
+                    'json' => $body,
+                    'headers' => $options['headers']
+                ]);
+                $content = $response->getBody();
+            }
+
+            $result = @json_decode($content, true);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+        return $result;
+    }
+
     /**
      * 回归测试
      */

@@ -2,6 +2,12 @@
 
 return [
 
+    //外部接口
+    'otherApi'  => [
+        // 项目名 => 获取该项目接口列表的接口
+        // 'rpc' => 'http://127.0.0.1:18306/apidoc/getApiDoc',
+    ],
+
     // 路由分组的分隔符
     'delimiter' => '.',
 

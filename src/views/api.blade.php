@@ -80,16 +80,16 @@
 
                 <?php if ($model): ?>
                     <h1>
-                        <?php echo $model->title(); ?>
-                        <?php if ($model->author()): ?>
-                            <span style="font-size:16px;margin-left:20px;">— <?php echo $model->author(); ?>
+                        <?php echo $model['title']; ?>
+                        <?php if ($model['author']): ?>
+                            <span style="font-size:16px;margin-left:20px;">— <?php echo $model['author']; ?>
                                 <button id="regression_testing" type="button" data-toggle="modal" data-target="#mymodal" class="btn save-btn" style="float: right;">回归测试</button>
                             </span>
 
                         <?php endif; ?>
                     </h1>
 
-                    <pre><span class="label label-primary"><?php echo $model->method(); ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model->uses() ? "<br/><b>用途：{$model->uses()}</b>" : ''; ?><br/><br/><b>回归测试：</b><input id="save_reg_test" type="checkbox"/><br/><br/><b>完全匹配：</b><input type="radio" name="reg-model" value="1"/>&nbsp;<b>请求成功：</b><input type="radio" name="reg-model" value="2">
+                    <pre><span class="label label-primary"><?php echo $model['method']; ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model['uses'] ? "<br/><b>用途：{$model['uses']}</b>" : ''; ?><br/><br/><b>回归测试：</b><input id="save_reg_test" type="checkbox"/><br/><br/><b>完全匹配：</b><input type="radio" name="reg-model" value="1"/>&nbsp;<b>请求成功：</b><input type="radio" name="reg-model" value="2">
                     </pre>
                     <ul class="tabs">
                         <li class="active"><a href="#tab1">接口文档</a></li>
@@ -100,11 +100,11 @@
                             <?php
                                 echo view('document::_table', [
                                     'title'  => '请求头',
-                                    'values' => $model->header(),
+                                    'values' => $model['header'],
                                 ]);
                                 echo view('document::_table', [
                                     'title'  => '请求参数',
-                                    'values' => $model->params(),
+                                    'values' => $model['params'],
                                 ]);
                             ?>
 
@@ -318,10 +318,10 @@
 
             //保存请求响应示例
             $('.submit-example').click(function(){
-                var request_method = '<?php echo !empty($model) ? $model->method() : ''; ?>';
-                var author = '<?php echo !empty($model) ? $model->author() : ''; ?>';
-                var uses = '<?php echo !empty($model) ? $model->uses() : ''; ?>';
-                var title = '<?php echo !empty($model) ? $model->title() : ''; ?>';
+                var request_method = '<?php echo !empty($model) ? $model['method'] : ''; ?>';
+                var author = '<?php echo !empty($model) ? $model['author'] : ''; ?>';
+                var uses = '<?php echo !empty($model) ? $model['uses'] : ''; ?>';
+                var title = '<?php echo !empty($model) ? $model['title'] : ''; ?>';
                 var type = $(this).attr('name');
 
                 var btn = $(this).button('loading');
@@ -353,8 +353,8 @@
                 });
             });
         });
-        
-        function uploadExample() {                        
+
+        function uploadExample() {
             $.ajax({
                 url: '/document/upload-example',
                 type: 'POST',
@@ -362,10 +362,10 @@
                     url: debugUrl,
                     regression_test: Number($("#save_reg_test").prop('checked')),
                     regression_model: $(":radio[name=reg-model]:checked").val(),
-                    method: '<?php echo !empty($model) ? $model->method() : ''; ?>',
-                    title: '<?php echo !empty($model) ? $model->title() : ''; ?>',
-                    author: '<?php echo !empty($model) ? $model->author() : ''; ?>',
-                    uses: '<?php echo !empty($model) ? $model->uses() : ''; ?>'
+                    method: '<?php echo !empty($model) ? $model['method'] : ''; ?>',
+                    title: '<?php echo !empty($model) ? $model['title'] : ''; ?>',
+                    author: '<?php echo !empty($model) ? $model['author'] : ''; ?>',
+                    uses: '<?php echo !empty($model) ? $model['uses'] : ''; ?>'
                 },
                 success: function(retData) {
                 },
@@ -374,7 +374,7 @@
                 }
             });
         }
-        
+
         //获取当前时间，date格式
         function getDate(){
             var nowDate = new Date();

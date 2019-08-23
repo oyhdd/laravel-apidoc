@@ -147,4 +147,17 @@ class ActionModel
     {
         return $this->_uses;
     }
+
+    public function getAll()
+    {
+        return [
+            'name' => $this->_name,
+            'title' => $this->_title,
+            'method' => strtoupper($this->_method),
+            'params' => $this->_params,
+            'header' => $this->_header,
+            'author' => $this->_author,
+            'uses' => $this->_uses
+        ];
+    }
 }

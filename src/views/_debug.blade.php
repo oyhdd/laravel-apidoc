@@ -19,8 +19,8 @@
             </br></br>
             <form role="form" class="debug">
                 <h3>header</h3>
-                <?php if ($model->header()): ?>
-                    <?php foreach ($model->header() as $param): ?>
+                <?php if ($model['header']): ?>
+                    <?php foreach ($model['header'] as $param): ?>
                         <div class="form-group">
                             <label>
                                 <?php
@@ -37,8 +37,8 @@
                     <span>无</span>
                 <?php endif; ?>
                 <h3>body</h3>
-                <?php if ($model->params()): ?>
-                    <?php foreach ($model->params() as $param): ?>
+                <?php if ($model['params']): ?>
+                    <?php foreach ($model['params'] as $param): ?>
                         <div class="form-group">
                             <label>
                                 <?php
@@ -83,9 +83,9 @@
     var data = {};
     var can_save = false;
     var response = {};
-    var author = '<?php echo $model->author(); ?>';
-    var uses = '<?php echo $model->uses(); ?>';
-    var title = '<?php echo $model->title(); ?>';
+    var author = '<?php echo $model['author']; ?>';
+    var uses = '<?php echo $model['uses']; ?>';
+    var title = '<?php echo $model['title']; ?>';
     var debugUrl = '<?php echo $debugUrl; ?>';
     var request_method;
     var testUnitData = {};
@@ -93,7 +93,7 @@
     $(function(){
 
         $('#submit-btn').click(function(){
-            request_method = '<?php echo $model->method(); ?>';
+            request_method = '<?php echo $model['method']; ?>';
 
             var form = new FormData();
             var processData = false;
