@@ -89,7 +89,7 @@
                         <?php endif; ?>
                     </h1>
 
-                    <pre><span class="label label-primary"><?php echo $model['method']; ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><?php echo $model['uses'] ? "<br/><b>用途：{$model['uses']}</b>" : ''; ?><br/><br/><b>回归测试：</b><input id="save_reg_test" type="checkbox"/><br/><br/><b>完全匹配：</b><input type="radio" name="reg-model" value="1"/>&nbsp;<b>请求成功：</b><input type="radio" name="reg-model" value="2">
+                    <pre><span class="label label-primary"><?php echo $model['method']; ?></span>  <span class="label label-default"><?php echo !empty($debugRoute) ? '{host}/'.$debugRoute : ''; ?></span><br/><br/><?php echo $model['uses'] ? "<b>用途：{$model['uses']}</b>" : ''; ?><br/><b>回归测试：</b><input id="save_reg_test" type="checkbox"/><br/><b>完全匹配：</b><input type="radio" name="reg-model" value="1"/>&nbsp;<b>请求成功：</b><input type="radio" name="reg-model" value="2">
                     </pre>
                     <ul class="tabs">
                         <li class="active"><a href="#tab1">接口文档</a></li>

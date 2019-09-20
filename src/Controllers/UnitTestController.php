@@ -68,7 +68,7 @@ class UnitTestController extends Controller
         $test_title = $request->get('test_title');
         $header = $request->get('header');
         $body = $request->get('body');
-        $response_md5 = md5(trim($request->get('response')));
+        $response_md5 = md5(stripslashes(trim($request->get('response'))));
         $url = $request->get('url');
         $method = $request->get('method');
         if (empty($test_title)) {
@@ -321,7 +321,7 @@ class UnitTestController extends Controller
             if ($response['success']) {
                 //完全匹配
                 if ($requestData[$key]['regression_model'] == ApiDoc::MODEL_REG_STRCIT) {
-                    $success = (md5(trim($response['response'])) == $apiDocs[$api_id]['api_params'][$index]['response_md5']);
+                    $success = (md5(stripslashes(trim($response['response']))) == $apiDocs[$api_id]['api_params'][$index]['response_md5']);
                 } elseif ($requestData[$key]['regression_model'] == ApiDoc::MODEL_REG_REQUEST) {
                     $success = true;
                 }
