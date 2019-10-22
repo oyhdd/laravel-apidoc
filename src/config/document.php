@@ -5,7 +5,10 @@ return [
     //外部接口
     'otherApi'  => [
         // 项目名 => 获取该项目接口列表的接口
-        // 'rpc' => 'http://127.0.0.1:18306/apidoc/getApiDoc',
+        // 'rpc' => [
+        //     'url' => 'http://127.0.0.1:18306/apidoc/getApiDoc', //获取该项目接口列表的接口
+        //     'token' => 'CVf3d5FYAG7786evdgsvF9ds5', //访问令牌
+        // ],
     ],
 
     // 路由分组的分隔符

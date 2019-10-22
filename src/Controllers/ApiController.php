@@ -102,15 +102,20 @@ class ApiController extends Controller
         ];
     }
 
-    public function getOtherApi($url, $action = '')
+    public function getOtherApi($api, $action = '')
     {
         try {
             $client = new Client();
+            $url = $api['url'] ?? '';
             if (!empty($action)) {
                 $url .= '?action='.$action;
             }
+            $options = [];
+            if (!empty($api['token'])) {
+                $options = ['headers' => ['token' => $api['token']]];
+            }
 
-            $response = $client->request('GET', $url);
+            $response = $client->request('GET', $url, $options);
             $content = $response->getBody()->getContents();
             $result = @json_decode($content, true);
             if (!isset($result['code']) || $result['code'] != 0) {

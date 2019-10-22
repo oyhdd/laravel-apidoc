@@ -47,7 +47,7 @@
 
         <!-- 模态弹出窗 -->
         <div class="modal fade" id="mymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden='true' data-backdrop='static'>
-            <div class="modal-dialog">
+            <div class="modal-dialog" style="width: 700px;">
                 <div class="modal-content">
                     <div class="modal-header" style="padding:15px 15px 5px;">
                         <h2 class="modal-title" id="myModalLabel">回归测试
@@ -241,7 +241,7 @@
                                 }
 
                                 html += "<div class='panel panel-default'><div class='panel-heading' style='background-color: #e9e9ec;'>"
-                                    + "<h3 class='panel-title'><span class='label label-primary'>"
+                                    + "<h3 class='panel-title' style='word-break: break-word;'><span class='label label-primary'>"
                                     + temp.title + "</span>&nbsp;<span class='label label-info'>" + temp.method + "</span>&nbsp;&nbsp;<span class='label label-default'>"
                                     + temp.url + "</span>&nbsp;"
                                     + "<span class='" + fail_count_class + "'>失败："
