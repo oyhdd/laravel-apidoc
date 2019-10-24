@@ -25,7 +25,7 @@
                             <label>
                                 <?php
                                     echo $param['name'];
-                                    if (!empty($param['is_necessary'])) {
+                                    if (!empty($param['is_necessary']) && $param['is_necessary'] === 'true') {
                                         echo '<span style="color:red">&nbsp*</span>';
                                     }
                                 ?>
@@ -43,7 +43,7 @@
                             <label>
                                 <?php
                                     echo $param['name'];
-                                    if (!empty($param['is_necessary'])) {
+                                    if (!empty($param['is_necessary']) && $param['is_necessary'] === 'true') {
                                         echo '<span style="color:red">&nbsp*</span>';
                                     }
                                 ?>
@@ -88,6 +88,7 @@
     var title = '<?php echo $model['title']; ?>';
     var debugUrl = '<?php echo $debugUrl; ?>';
     var localApi = '<?php echo $localApi; ?>';
+    var isRestful = '<?php echo $isRestful; ?>';
     var request_method;
     var testUnitData = {};
 
@@ -153,6 +154,13 @@
                 processData = true;
                 contentType = true;
             }
+
+            if (isRestful) {
+                for(var i in data) {
+                    debugUrl = debugUrl.replace('{'+i+'}',data[i]);
+                }
+            }
+
             if (localApi) {
                 $.ajax({
                     url: debugUrl,

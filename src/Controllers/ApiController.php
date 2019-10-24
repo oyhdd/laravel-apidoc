@@ -12,20 +12,21 @@ use GuzzleHttp\Client;
  */
 class ApiController extends Controller
 {
-    public $delimiter;//路由分组的分隔符
+    public $delimiter;                  //路由分组的分隔符
 
-    public $hiddenMethods; //不想展示出来的接口可以在此定义
-    public $showUndefinedRouter;//是否显示未配置路由的接口
+    public $hiddenMethods;              //不想展示出来的接口可以在此定义
+    public $showUndefinedRouter;        //是否显示未配置路由的接口
 
     protected $undefinedRouterList = [];//未配置的路由
-    protected $routerList = [];//已配置的路由
-    protected $host;//域名
-    protected $action;//当前请求的接口
-    protected $actionModel;//当前请求的接口详情类
-    protected $debugRoute;//当前请求的路由(不含host)
-    protected $debugUrl;//当前请求的完整路由(包含host)
-    protected $visualRoute;//用于可视化分析的接口（当前接口）
-    protected $project;    //当前请求的项目
+    protected $routerList = [];         //已配置的路由
+    protected $host;                    //域名
+    protected $action;                  //当前请求的接口
+    protected $actionModel;             //当前请求的接口详情类
+    protected $debugRoute;              //当前请求的路由(不含host)
+    protected $debugUrl;                //当前请求的完整路由(包含host)
+    protected $visualRoute;             //用于可视化分析的接口（当前接口）
+    protected $project;                 //当前请求的项目
+    protected $isRestful = false;       //是否是restful接口
 
     function __construct()
     {
@@ -62,6 +63,7 @@ class ApiController extends Controller
 
             if ($this->project == $project) {
                 $result['debugRoute'] = $resultApi['debugRoute'];
+                $result['isRestful'] = $resultApi['isRestful'] ?? false;
                 $result['debugUrl'] = $resultApi['debugUrl'];
                 $result['debugUrl'] = $resultApi['debugUrl'];
                 $result['model'] = $resultApi['model'];
@@ -98,6 +100,7 @@ class ApiController extends Controller
             'model' => empty($this->actionModel) ? [] : $this->actionModel->getAll(),
             'debugRoute' => $this->debugRoute,
             'debugUrl' => $this->debugUrl,
+            'isRestful' => $this->isRestful,
             'visualRoute' => $this->visualRoute,
         ];
     }
@@ -131,6 +134,7 @@ class ApiController extends Controller
                 'model' => [],
                 'debugRoute' => '',
                 'debugUrl' => '',
+                'isRestful' => false,
             ];
         }
 

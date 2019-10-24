@@ -134,6 +134,7 @@
                                     'debugUrl'   => $debugUrl,
                                     'model'      => $model,
                                     'localApi'   => $localApi,
+                                    'isRestful'  => $isRestful,
                                 ]);
                             ?>
                         </div>

@@ -18,7 +18,7 @@
         <?php foreach ($values as $value): ?>
             <tr>
                 <td><?php echo empty($value['name']) ? '' : $value['name']; ?></td>
-                <td><?php echo empty($value['is_necessary']) ? 'false' : 'true'; ?></td>
+                <td><?php echo (!empty($value['is_necessary']) && $value['is_necessary'] === 'true') ? 'true' : 'false'; ?></td>
                 <td><?php echo empty($value['type']) ? '' : $value['type']; ?></td>
                 <td><?php echo empty($value['desc']) ? '' : $value['desc']; ?></td>
             </tr>

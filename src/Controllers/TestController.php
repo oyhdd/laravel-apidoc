@@ -16,7 +16,7 @@ class TestController extends Controller
      * @header string|true               $token              header头
      * @param  string|true               $str                字符串
      * @param  int|true                  $number             数字
-     * @param  array|true                $arr                数组
+     * @param  array|false               $arr                数组
      * @return array
      */
     public function test1(Request $request)
