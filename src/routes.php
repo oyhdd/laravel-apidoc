@@ -17,7 +17,9 @@ Route::post('/document/visual-code', 'Oyhdd\Document\Controllers\VisualCodeContr
 Route::group([], function ($router) {
     // 接口组
     $router->name('测试.')->group(function ($router) {
-        $router->post('test1', 'Oyhdd\Document\Controllers\TestController@test1');
-        $router->get('test2', 'Oyhdd\Document\Controllers\TestController@test2');
+        $router->get('test1', 'Oyhdd\Document\Controllers\TestController@test1');
+        $router->post('test2', 'Oyhdd\Document\Controllers\TestController@test2');
+        $router->get('test3/{id}', 'Oyhdd\Document\Controllers\TestController@test3');
+        $router->post('test4/{id}', 'Oyhdd\Document\Controllers\TestController@test4');
     });
 });

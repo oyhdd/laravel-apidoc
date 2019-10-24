@@ -316,6 +316,10 @@ class ApiController extends Controller
                             $this->debugRoute = '';
                         }
                         $active = true;
+                        $this->isRestful = false;
+                        if (preg_match_all('/(\/{.*})/', $route['href'], $matches) && !empty($matches[1])) {
+                            $this->isRestful = true;
+                        }
                         $this->visualRoute = addslashes($class.$this->delimiter.$method->name);
                         $cur_method = $this->getMethod($route['methods']);
                         if (!empty($cur_method)) {

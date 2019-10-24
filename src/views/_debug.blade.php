@@ -87,6 +87,7 @@
     var uses = '<?php echo $model['uses']; ?>';
     var title = '<?php echo $model['title']; ?>';
     var debugUrl = '<?php echo $debugUrl; ?>';
+    var saveDebugUrl = '<?php echo $debugUrl; ?>';
     var localApi = '<?php echo $localApi; ?>';
     var isRestful = '<?php echo $isRestful; ?>';
     var request_method;
@@ -154,13 +155,12 @@
                 processData = true;
                 contentType = true;
             }
-
+            debugUrl = saveDebugUrl;
             if (isRestful) {
                 for(var i in data) {
                     debugUrl = debugUrl.replace('{'+i+'}',data[i]);
                 }
             }
-
             if (localApi) {
                 $.ajax({
                     url: debugUrl,
@@ -328,7 +328,7 @@
                 data: {
                     test_title: test_title,
                     title: title,
-                    url: debugUrl,
+                    url: saveDebugUrl,
                     method: request_method,
                     header: JSON.stringify(header),
                     body: JSON.stringify(data),
@@ -350,7 +350,7 @@
             btn.button('reset');
         });
 
-        // 保存测试用例
+        // 删除测试用例
         $('#delete-btn').click(function(){
             if(!confirm("确定删除该测试用例?")){
                 return;
@@ -397,7 +397,7 @@
                 url: '/document/get-api-params',
                 type: 'GET',
                 data: {
-                    url: debugUrl,
+                    url: saveDebugUrl,
                 },
                 success: function(retData) {
                     if (retData.code == 0) {

@@ -183,7 +183,7 @@
     </body>
     <script type="text/javascript">
 
-        var debugUrl = '<?php echo $debugUrl; ?>';
+        var saveDebugUrl = '<?php echo $debugUrl; ?>';
 
         $(document).ready(function() {
 
@@ -327,7 +327,7 @@
                 var type = $(this).attr('name');
 
                 var btn = $(this).button('loading');
-                if (debugUrl == '') {
+                if (saveDebugUrl == '') {
                     alert("未配置路由");
                     btn.button('reset');
                     return;
@@ -340,7 +340,7 @@
                         title: title,
                         type: type,
                         value: desc,
-                        url: debugUrl,
+                        url: saveDebugUrl,
                         method: request_method,
                         author: author,
                         uses: uses,
@@ -361,7 +361,7 @@
                 url: '/document/upload-example',
                 type: 'POST',
                 data: {
-                    url: debugUrl,
+                    url: saveDebugUrl,
                     regression_test: Number($("#save_reg_test").prop('checked')),
                     regression_model: $(":radio[name=reg-model]:checked").val(),
                     method: '<?php echo !empty($model) ? $model['method'] : ''; ?>',
@@ -395,7 +395,7 @@
                 url: '/document/get-example',
                 type: 'GET',
                 data: {
-                    url: debugUrl,
+                    url: saveDebugUrl,
                 },
                 success: function(retData) {
                     if (retData.regression_test == 1) {

@@ -221,6 +221,12 @@ class UnitTestController extends Controller
                 foreach ($apiDoc['api_params'] as $key => $apiParams) {
                     $body = json_decode($apiParams['body'], true);
                     $header = json_decode($apiParams['header'], true);
+                    if (empty($body)) {
+                        $body = [];
+                    }
+                    if (empty($header)) {
+                        $header = [];
+                    }
                     foreach ($body as $key1 => $value) {
                         if (is_array($value) && substr($key1, -2) == '[]') {
                             unset($body[$key1]);
@@ -230,8 +236,14 @@ class UnitTestController extends Controller
                     if (!empty($auth)) {
                         $header['Authorization'] = $auth;
                     }
+                    $url = $apiDoc['url'];
+                    if (preg_match_all('/(\/{.*})/', $url, $matches) && !empty($matches[1])) {
+                        foreach ($body as $p_key => $p_value) {
+                            $url = str_replace('{'.$p_key.'}', $p_value, $url);
+                        }
+                    }
                     $requestData[] = [
-                        'url' => $apiDoc['url']."?".http_build_query($body),
+                        'url' => $url."?".http_build_query($body),
                         'headers' => $header,
                         'key' => $key,
                         'api_id' => $apiId,
@@ -244,7 +256,12 @@ class UnitTestController extends Controller
                 foreach ($apiDoc['api_params'] as $key => $apiParams) {
                     $body = json_decode($apiParams['body'], true);
                     $header = json_decode($apiParams['header'], true);
-
+                    if (empty($body)) {
+                        $body = [];
+                    }
+                    if (empty($header)) {
+                        $header = [];
+                    }
                     foreach ($body as $key1 => $value) {
                         if (is_array($value) && substr($key1, -2) == '[]') {
                             unset($body[$key1]);
@@ -255,8 +272,15 @@ class UnitTestController extends Controller
                     if (!empty($auth)) {
                         $header['Authorization'] = $auth;
                     }
+
+                    $url = $apiDoc['url'];
+                    if (preg_match_all('/(\/{.*})/', $url, $matches) && !empty($matches[1])) {
+                        foreach ($body as $p_key => $p_value) {
+                            $url = str_replace('{'.$p_key.'}', $p_value, $url);
+                        }
+                    }
                     $requestData[] = [
-                        'url' => $apiDoc['url'],
+                        'url' => $url,
                         'form_params' => $body,
                         'headers' => $header,
                         'key' => $key,
